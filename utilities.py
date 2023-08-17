@@ -9,7 +9,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     src_dir = 'AMI_dataset'
     
     if(path.exists(filename)):
-      !rm $filename
+      os.remove(filename)
       print('existing file:', filename, ' has been deleted')
     print('downloading latest version of file:', filename)
     wget.download(data_path, filename)
@@ -26,7 +26,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     src_dir = 'ear/processed/221'
 
     if(path.exists(filename)):
-      !rm $filename
+      os.remove(filename)
       print('existing file:', filename, ' has been deleted')
     print('downloading latest version of file:', filename)
     wget.download(data_path, filename)
