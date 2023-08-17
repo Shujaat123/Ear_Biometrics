@@ -1,3 +1,7 @@
+from os import listdir
+from os import path
+
+##################
 def load_dataset(dataset='AMI', target_size = (50, 180)):
   ### This function load ear-biometric datasets and reshape into specified size
   ##########
