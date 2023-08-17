@@ -1,5 +1,4 @@
-from os import listdir
-from os import path
+import os
 
 ##################
 def load_dataset(dataset='AMI', target_size = (50, 180)):
@@ -12,7 +11,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     filename = 'AMI_dataset.zip'
     src_dir = 'AMI_dataset'
     
-    if(path.exists(filename)):
+    if(os.path.exists(filename)):
       os.remove(filename)
       print('existing file:', filename, ' has been deleted')
     print('downloading latest version of file:', filename)
@@ -29,7 +28,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     filename='IITD_Dataset.7z'
     src_dir = 'ear/processed/221'
 
-    if(path.exists(filename)):
+    if(os.path.exists(filename)):
       os.remove(filename)
       print('existing file:', filename, ' has been deleted')
     print('downloading latest version of file:', filename)
