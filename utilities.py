@@ -53,7 +53,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     print('Unknown dataset')
 
 
-  images_name = listdir(src_dir)
+  images_name = os.listdir(src_dir)
   images_name_temp = []
   subjects = []
   for img_ind in range(0,len(images_name)):
