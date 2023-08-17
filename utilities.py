@@ -17,7 +17,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
 
     with ZipFile('AMI_dataset.zip', mode='r') as z:
         z.extractall()
-    !ls
+    print(os.listdir())
 
   elif (dataset=='IITD_dataset'):
     # target_size = (50, 180)
@@ -34,7 +34,7 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
 
     with py7zr.SevenZipFile('IITD_Dataset.7z', mode='r') as z:
         z.extractall()
-    !ls
+    print(os.listdir())
 
   else:
     print('Unknown dataset')
