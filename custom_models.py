@@ -251,6 +251,39 @@ class LSE_model(torch.nn.Module):
     out = self.classification_module(encoded_output)
     decoded_output = self.feature_decoder_module(encoded_output)
     return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
+
+
+class Simple_Classification_model(torch.nn.Module):
+  #  Determine what layers and their order in CNN object
+  def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3)):
+    super(Simple_Classification_model,self).__init__()
+
+    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.classification_module = Classifier_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.input_shape = input_shape
+
+  def forward(self,x):
+    # Encoder Layer1
+    encoded_output = self.feature_extraction_module(x)
+    out = self.classification_module(encoded_output)
+    return out
+
+
+class AutoEncoder_model(torch.nn.Module):
+  #  Determine what layers and their order in CNN object
+  def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3)):
+    super(AutoEncoder_model,self).__init__()
+
+    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.feature_decoder_module = Feature_Decoder_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.input_shape = input_shape
+
+  def forward(self,x):
+    # Encoder Layer1
+    encoded_output = self.feature_extraction_module(x)
+    decoded_output = self.feature_decoder_module(encoded_output)
+    return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
+
   
 
   
