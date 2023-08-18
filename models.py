@@ -112,7 +112,7 @@ class Feature_Extraction_Module(torch.nn.Module):
     return out
   
 
-  class Feature_Decoder_Module(torch.nn.Module):
+class Feature_Decoder_Module(torch.nn.Module):
   #  Determine what layers and their order in CNN object
   def __init__(self, num_classes=221, num_filters=8, input_shape=(180,50,3)):
     super(Feature_Decoder_Module,self).__init__()
@@ -251,5 +251,5 @@ class LSE_model(torch.nn.Module):
     decoded_output = self.feature_decoder_module(encoded_output)
     return out, decoded_output[:,:,0:input_shape[0],0:input_shape[1]]
   
-  
+
   
