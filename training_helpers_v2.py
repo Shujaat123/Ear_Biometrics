@@ -12,9 +12,9 @@ def to_categorical(y, num_classes):
     return np.eye(num_classes, dtype='uint8')[y]
 
 # manaul training
-def train_one_epoch(training_loader, validation_loader, model_type='DeepLSE',
-                    model, optimizer, lambda=0.5, lambda1=0.5, lambda2=0.5,
-                    input_shape, num_filter, num_classes):
+def train_one_epoch(training_loader, validation_loader, 
+                    model, optimizer, input_shape, num_classes, num_filters, 
+                    model_type='DeepLSE', lambda0=0.5, lambda1=0.5, lambda2=0.5):
     # training metrics
     train_loss = 0
     train_correct = 0
@@ -152,9 +152,8 @@ def train_one_epoch(training_loader, validation_loader, model_type='DeepLSE',
 
 # manaul training
 def train_one_epoch_improved(training_loader, validation_loader,
-                             model_type='DeepLSE', model, optimizer, lambda=0.5,
-                             lambda1=0.5, lambda2=0.5, input_shape, num_filter,
-                             num_classes):
+                             model, optimizer, input_shape, num_classes, num_filters, 
+                             model_type='DeepLSE', lambda0=0.5, lambda1=0.5, lambda2=0.5):
 
     # training metrics
     train_loss = 0
@@ -289,9 +288,13 @@ def train_one_epoch_improved(training_loader, validation_loader,
 
     return train_loss, training_accuracy, valid_loss, validation_accuracy
 
-def train_epoches(epochs = 50, model_type='DeepLSE', model, optimizer, lambda=0.5,
-                             lambda1=0.5, lambda2=0.5, input_shape, num_filter,
-                             num_classes):
+def train_epoches(training_loader, validation_loader, 
+                  model, optimizer, input_shape, num_classes, num_filters, 
+                  epochs = 50, model_type='DeepLSE', 
+                  lambda0=0.5, lambda1=0.5, lambda2=0.5):
+
+
+
   #EPOCHS = 50
   #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
   for epoch in range(epochs):
@@ -313,9 +316,8 @@ def train_epoches(epochs = 50, model_type='DeepLSE', model, optimizer, lambda=0.
     # lambda1 = np.remainder(epoch,2)
 
     train_loss, valid_loss = train_one_epoch(training_loader, validation_loader,
-                                             model_type, model, optimizer,
-                                             lambda1, lambda2, input_shape,
-                                             num_filter, num_classes)
+                                             model, optimizer, input_shape,
+                                             num_classes, num_filters)
 
 # added by Atif
 def checkpoint(model, filename):
@@ -340,9 +342,11 @@ def reset_weights(model):
     layer.reset_parameters()
 
 # Best model saving and early stopping
-def train_epoches_improved(epochs = 50, lambda=0.5, lambda1=0.5, lambda2=0.5,
-                  model_type='DeepLSE', model, optimizer, input_shape,
-                  num_filter, num_classes, early_stop_thresh = 5):
+def train_epoches_improved(training_loader, validation_loader, 
+                           model, optimizer, input_shape, num_classes, num_filters, 
+                           epochs = 50, model_type='DeepLSE', 
+                           lambda0=0.5, lambda1=0.5, lambda2=0.5, 
+                           early_stop_thresh = 5):
 
   best_validation_accuracy = -1
   best_validation_epoch = -1
@@ -367,9 +371,7 @@ def train_epoches_improved(epochs = 50, lambda=0.5, lambda1=0.5, lambda2=0.5,
 
     train_loss, training_accuracy, valid_loss, validation_accuracy =
       train_one_epoch_improved(training_loader, validation_loader,
-                               model_type=, model, optimizer, lambda=0.5,
-                               lambda1=0.5, lambda2=0.5, input_shape,
-                               num_filter, num_classes)
+                               model, optimizer, input_shape, num_classes, num_filters)
 
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {train_loss/len(training_loader)}")
 
@@ -388,10 +390,13 @@ def train_epoches_improved(epochs = 50, lambda=0.5, lambda1=0.5, lambda2=0.5,
 
     return best_validation_accuracy, best_validation_epoch
 
-def train_folds(dataset = TensorDataset(transform(torch.tensor(ear_images)), torch.tensor(sub_labels)),
-                k_folds = 5, epochs = 50, lambda=0.5, lambda1=0.5, lambda2=0.5, model_type='DeepLSE',
-                model, optimizer, input_shape, num_filter, num_classes, early_stop_thresh = 5):
+def train_folds(dataset, sub_labels), model_type='DeepLSE',
+                model, optimizer, k_folds, epochs, 
+                lambda0, lambda1, lambda2, 
+                input_shape, num_filter, num_classes, 
+                early_stop_thresh = 5):
   # Initializing in a separate cell so we can easily add more epochs to the same run
+
   # For k fold results
   results = {}
 
