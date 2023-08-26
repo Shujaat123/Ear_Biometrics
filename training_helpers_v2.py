@@ -369,8 +369,7 @@ def train_epoches_improved(training_loader, validation_loader,
     # lambda1=(1+epoch)/EPOCHS
     # lambda1 = np.remainder(epoch,2)
 
-    train_loss, training_accuracy, valid_loss, validation_accuracy =
-      train_one_epoch_improved(training_loader, validation_loader,
+    train_loss, training_accuracy, valid_loss, validation_accuracy = train_one_epoch_improved(training_loader, validation_loader,
                                model, optimizer, input_shape, num_classes, num_filters)
 
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {train_loss/len(training_loader)}")
@@ -390,10 +389,10 @@ def train_epoches_improved(training_loader, validation_loader,
 
     return best_validation_accuracy, best_validation_epoch
 
-def train_folds(dataset, sub_labels), model_type='DeepLSE',
-                model, optimizer, k_folds, epochs, 
+def train_folds(dataset, k_folds, epochs, 
+                model_type, model, optimizer,  
                 lambda0, lambda1, lambda2, 
-                input_shape, num_filter, num_classes, 
+                input_shape, num_filters, num_classes, 
                 early_stop_thresh = 5):
   # Initializing in a separate cell so we can easily add more epochs to the same run
 
@@ -429,8 +428,7 @@ def train_folds(dataset, sub_labels), model_type='DeepLSE',
     model.apply(reset_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    best_validation_accuracy, best_validation_epoch =
-      train_epoches_improved(epochs, lambda1, lambda2, model_type, model,
+    best_validation_accuracy, best_validation_epoch = train_epoches_improved(epochs, lambda1, lambda2, model_type, model,
                              optimizer, input_shape, num_filter, num_classes,
                              early_stop_thresh = 5)
 
