@@ -413,7 +413,7 @@ def train_folds(dataset, k_folds, epochs,
   kfold = KFold(n_splits=k_folds, shuffle=True)
 
   # K-fold Cross Validation model evaluation
-  for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)):
+  for fold, (train_ids, validation_ids) in enumerate(kfold.split(dataset)):
 
     # Print
     print(f'FOLD {fold}')
@@ -421,15 +421,15 @@ def train_folds(dataset, k_folds, epochs,
 
     # Sample elements randomly from a given list of ids, no replacement.
     train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
-    test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
+    validation_subsampler = torch.utils.data.SubsetRandomSampler(validation_ids)
 
     # Define data loaders for training and testing data in this fold
-    trainloader = torch.utils.data.DataLoader(
+    training_loader = torch.utils.data.DataLoader(
                     dataset,
                     batch_size=10, sampler=train_subsampler)
-    testloader = torch.utils.data.DataLoader(
+    validation_loader = torch.utils.data.DataLoader(
                     dataset,
-                    batch_size=1, sampler=test_subsampler)
+                    batch_size=1, sampler=validation_subsampler)
 
     # Added by Atif
     # Reset model weights before each fold
