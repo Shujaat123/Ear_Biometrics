@@ -170,5 +170,6 @@ def train_epoches(epochs = 50, lambda=0.5, lambda1=0.5, lambda2=0.5, model_type=
     # lambda1=(1+epoch)/EPOCHS
     # lambda1 = np.remainder(epoch,2)
 
-    train_loss, valid_loss = train_one_epoch(lambda1=lambda1, lambda2=lambda2, model_type=model_type)
+    train_loss, valid_loss = train_one_epoch(lambda1=lambda1, lambda2=lambda2, model_type=model_type,
+                                            model, optimizer, input_shape, num_filter, num_classes)
     epoch_number += 1
