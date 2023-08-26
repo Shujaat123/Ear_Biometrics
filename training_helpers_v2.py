@@ -168,6 +168,8 @@ def train_one_epoch_improved(training_loader, validation_loader,
                              model, optimizer, input_shape, num_classes, num_filters, 
                              model_type='DeepLSE', lambda0=0.5, lambda1=0.5, lambda2=0.5):
 
+    training_samples = len(training_loader.dataset)
+    validation_samples = len(validation_loader.dataset)
     #loss function
     loss_fn = torch.nn.CrossEntropyLoss()
     loss_fn2 = torch.nn.MSELoss()
