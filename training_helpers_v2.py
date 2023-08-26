@@ -437,7 +437,7 @@ def train_folds(dataset, k_folds, epochs,
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
     best_validation_accuracy, best_validation_epoch = train_epoches_improved(epochs, lambda1, lambda2, model_type, model,
-                             optimizer, input_shape, num_filter, num_classes,
+                             optimizer, input_shape, num_filters, num_classes,
                              early_stop_thresh = 5)
 
     results[fold] = best_validation_accuracy
