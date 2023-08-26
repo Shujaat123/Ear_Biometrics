@@ -23,6 +23,11 @@ def to_categorical(y, num_classes):
 def train_one_epoch(training_loader, validation_loader, 
                     model, optimizer, input_shape, num_classes, num_filters, 
                     model_type='DeepLSE', lambda0=0.5, lambda1=0.5, lambda2=0.5):
+    
+    #loss function
+    loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn2 = torch.nn.MSELoss()
+    
     # training metrics
     train_loss = 0
     train_correct = 0
@@ -163,6 +168,10 @@ def train_one_epoch_improved(training_loader, validation_loader,
                              model, optimizer, input_shape, num_classes, num_filters, 
                              model_type='DeepLSE', lambda0=0.5, lambda1=0.5, lambda2=0.5):
 
+    #loss function
+    loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn2 = torch.nn.MSELoss()
+    
     # training metrics
     train_loss = 0
     train_correct = 0
