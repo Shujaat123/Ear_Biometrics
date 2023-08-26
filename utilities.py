@@ -49,28 +49,48 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
         z.extractall()
     print(os.listdir())
 
+  elif (dataset=='EarVN1dot0_dataset'):
+    # target_size = (50, 180)
+    data_path='https://github.com/Shujaat123/Ear_Biometrics/blob/main/datasets/EarVN1dot0_dataset.7z?raw=true'
+    filename='EarVN1dot0_dataset.7z'
+    src_dir = 'EarVN1dot0_dataset\Images'
+
+    if(os.path.exists(filename)):
+      os.remove(filename)
+      print('existing file:', filename, ' has been deleted')
+    print('downloading latest version of file:', filename)
+    wget.download(data_path, filename)
+    print('sucessfully downloaded')
+
+    with py7zr.SevenZipFile('IITD_Dataset.7z', mode='r') as z:
+        z.extractall()
+    print(os.listdir())
+
   else:
     print('Unknown dataset')
 
-
-  images_name = os.listdir(src_dir)
-  images_name_temp = []
+  images_path = []
   subjects = []
-  for img_ind in range(0,len(images_name)):
-    if(not(images_name[img_ind]=='Thumbs.db')):
-      subjects.append(int(images_name[img_ind].split('_')[0]))
-      images_name_temp.append(images_name[img_ind])
+  
+  for (root,dirs,images_name) in os.walk(src_dir, topdown=True):
+    for img_ind in range(0,len(images_name)):
+      if(not(images_name[img_ind]=='Thumbs.db')):
+        if (dataset=='EarVN1dot0_dataset'):
+          subjects.append(int(images_name[img_ind].split('.')[0]))
+          images_path.append(root + '/' + images_name[img_ind])
+        else:
+          subjects.append(int(images_name[img_ind].split('_')[0]))
+          images_path.append(root + '/' + images_name[img_ind])
 
-  images_name = images_name_temp
-  images_name_ord = []
+  images_path_ord = []
   subjects_ord = []
 
   sub_ind = sorted(range(len(subjects)),key=subjects.__getitem__)
   for pos, item in enumerate(sub_ind):
-    images_name_ord.append(images_name[item])
+    images_path_ord.append(images_path[item])
     subjects_ord.append(subjects[item])
 
-  images_name = images_name_ord
+  images_path = images_path_ord
   subjects = subjects_ord
 
   print(subjects)
@@ -83,14 +103,14 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
 
   subjects = list(subjects_temp)
   ################################################################
-  print(images_name)
+  print(images_path)
 
   img_ind = 0
   ear_images = []
   sub_labels = [];
 
   for sub_ind in range(0,len(subjects)):
-    img_path = src_dir+'/'+images_name[sub_ind]
+    img_path = images_path[sub_ind]
     ear_img = (plt.imread(img_path))/255
 
     ear_img = Image.open(img_path)
