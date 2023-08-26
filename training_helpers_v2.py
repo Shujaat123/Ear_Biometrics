@@ -339,13 +339,13 @@ def train_epoches(training_loader, validation_loader,
                                              num_classes, num_filters)
 
 # added by Atif
-def checkpoint(model, filename):
+def checkpoint(model, optimizer, filename):
   torch.save({
     'optimizer': optimizer.state_dict(),
     'model': model.state_dict(),
   }, filename)
 
-def resume(model, filename):
+def resume(model, optimizer, filename):
   checkpoint = torch.load(filename)
   model.load_state_dict(checkpoint['model'])
   optimizer.load_state_dict(checkpoint['optimizer'])
@@ -399,7 +399,7 @@ def train_epoches_improved(training_loader, validation_loader,
     if validation_accuracy > best_validation_accuracy:
       best_validation_accuracy = validation_accuracy
       best_validation_epoch = epoch
-      checkpoint(model, "best_model.pth")
+      checkpoint(model, optimizer, "best_model.pth")
 
     # early stopping
     elif epoch - best_validation_epoch > early_stop_thresh:
