@@ -14,13 +14,13 @@ def to_categorical(y, num_classes):
     return np.eye(num_classes, dtype='uint8')[y]
 
 # added by Atif
-def checkpoint(model, filename):
+def checkpoint(model, optimizer, filename):
   torch.save({
     'optimizer': optimizer.state_dict(),
     'model': model.state_dict(),
   }, filename)
 
-def resume(model, filename):
+def resume(model, optimizer, filename):
   checkpoint = torch.load(filename)
   model.load_state_dict(checkpoint['model'])
   optimizer.load_state_dict(checkpoint['optimizer'])
