@@ -445,7 +445,7 @@ def train_folds(dataset, k_folds, epochs,
     # Added by Atif
     # Reset model weights before each fold
     model.apply(reset_weights)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
     best_validation_accuracy, best_validation_epoch = train_epoches_improved(training_loader, validation_loader, 
                            model, optimizer, input_shape, num_classes, num_filters)       
