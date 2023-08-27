@@ -406,7 +406,7 @@ def train_epoches_improved(training_loader, validation_loader,
       print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
       break  # terminate the training loop
 
-    return best_validation_accuracy, best_validation_epoch
+  return best_validation_accuracy, best_validation_epoch
 
 def train_folds(dataset, k_folds, epochs, 
                 model_type, model, optimizer,  
