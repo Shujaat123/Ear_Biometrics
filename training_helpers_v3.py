@@ -28,7 +28,8 @@ def train_one_epoch(training_loader, validation_loader,
                     input_shape=(351, 246, 3), num_classes=100, num_filters=8,
                     model_type='Encoder+Classifier', model=None,
                     optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
-                    loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, device='cuda'):
+                    loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
+                    device='cuda'):
 
     # training metrics
     train_loss = 0
