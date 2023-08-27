@@ -6,6 +6,9 @@ import torch.nn.functional
 import torch.optim
 from torchvision import models #just for debugging
 
+loss_fn = torch.nn.CrossEntropyLoss()
+loss_fn2 = torch.nn.MSELoss()
+
 def to_categorical(y, num_classes):
     """ 1-hot encodes a tensor """
     return np.eye(num_classes, dtype='uint8')[y]
