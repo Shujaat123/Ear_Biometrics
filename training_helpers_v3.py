@@ -232,12 +232,12 @@ def reset_weights(m):
     print(f'Reset trainable parameters of layer = {layer}')
     layer.reset_parameters()
 
-def train_folds(dataset, k_folds, epochs_per_fold,
-                input_shape=(351, 246, 3), num_classes=100, num_filters=8,
+def train_folds(dataset, k_folds, input_shape=(351, 246, 3), 
+                num_classes=100, num_filters=8,
                 model_type='Encoder+Classifier', model=None,
                 optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
                 loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs = 50, resume=False, early_stop_thresh = 5,
+                epochs_per_fold = 50, resume=False, early_stop_thresh = 5,
                 train_device='cuda'):
   
   # Set fixed random number seed
