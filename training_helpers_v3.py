@@ -163,3 +163,59 @@ def train_one_epoch(training_loader, validation_loader,
     validation_accuracy = 100*valid_correct/num_validation_samples
 
     return train_loss, training_accuracy, valid_loss, validation_accuracy
+
+def train_epoches(training_loader, validation_loader,
+                  num_training_samples, num_validation_samples,
+                  input_shape=(351, 246, 3), num_classes=100, num_filters=8,
+                  model_type='Encoder+Classifier', model=None,
+                  optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
+                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
+                  epochs = 50, resume=False, early_stop_thresh = 5,
+                  device='cuda'):
+
+
+  epochs = 50
+  #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+  best_validation_accuracy = -1
+  best_validation_epoch = -1
+
+  for epoch in range(epochs):
+    print('EPOCH {}:'.format(epoch))
+    # if (epoch<3):
+    #   lambda1=0
+    # elif ((epoch>=3)&(epoch<10)):
+    #   lambda1=0.2
+    # elif ((epoch>=10)&(epoch<20)):
+    #lambda1=0.5
+    #lambda2=0.5
+    # model_type='DeepLSE'
+    # model_type='AutoEncoder'
+    # model_type='Classifier'
+    #model_type='Encoder+Classifier'
+    # else:
+    #   lambda1=0.6
+    # lambda1=(1+epoch)/EPOCHS
+    # lambda1 = np.remainder(epoch,2)
+
+    train_loss, training_accuracy, valid_loss, validation_accuracy = \
+      train_one_epoch(training_loader, validation_loader,
+                      num_training_samples, num_validation_samples,
+                      input_shape=input_shape, num_classes=num_classes,
+                      num_filters=num_filters, model_type=model_type,
+                      model=model, optimizer=optimizer,
+                      loss_fn=loss_fn, loss_fn2=loss_fn2,
+                      lambda1=lambda1, lambda2=lambda2, device=train_device)
+
+    print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {train_loss/len(training_loader)}")
+
+    print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {valid_loss/len(validation_loader)}")
+
+    if validation_accuracy > best_validation_accuracy:
+      best_validation_accuracy = validation_accuracy
+      best_validation_epoch = epoch
+      checkpoint(model, optimizer, "best_model.pth")
+
+    elif epoch - best_validation_epoch > early_stop_thresh:
+        print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
+        break  # terminate the training loop
