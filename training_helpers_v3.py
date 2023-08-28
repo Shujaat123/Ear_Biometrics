@@ -5,6 +5,7 @@ import torch.nn
 import torch.nn.functional
 import torch.optim
 from torchvision import models #just for debugging
+from  sklearn.model_selection import train_test_split, KFold # KFold is added by Atif
 
 def to_categorical(y, num_classes):
     """ 1-hot encodes a tensor """
@@ -277,7 +278,7 @@ def train_folds(dataset, k_folds, input_shape=(351, 246, 3),
                  num_filters=num_filters, model_type=model_type, 
                  model=model, optimizer=optimizer, loss_fn=loss_fn, 
                  loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2, 
-                 epochs = 50, resume=resume, 
+                 epochs = epochs_per_fold, resume=resume, 
                  early_stop_thresh = early_stop_thresh, 
                  train_device=train_device)
     
