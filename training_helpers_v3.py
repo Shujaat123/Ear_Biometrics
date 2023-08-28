@@ -164,7 +164,7 @@ def train_one_epoch(training_loader, validation_loader,
 
     return train_loss, training_accuracy, valid_loss, validation_accuracy
 
-def train_epoches(training_loader, validation_loader,
+def train_epochs(training_loader, validation_loader,
                   num_training_samples, num_validation_samples,
                   input_shape=(351, 246, 3), num_classes=100, num_filters=8,
                   model_type='Encoder+Classifier', model=None,
