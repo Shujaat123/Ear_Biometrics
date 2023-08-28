@@ -29,7 +29,7 @@ def train_one_epoch(training_loader, validation_loader,
                     model_type='Encoder+Classifier', model=None,
                     optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                     loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
-                    device='cuda'):
+                    train_device='cuda'):
 
     # training metrics
     train_loss = 0
@@ -96,8 +96,8 @@ def train_one_epoch(training_loader, validation_loader,
         if len(train_label.shape)==1:
           train_label = train_label.unsqueeze(dim=0)
 
-        train_input = train_input.to(torch.device(device))
-        train_label = train_label.to(torch.device(device))
+        train_input = train_input.to(torch.device(train_device))
+        train_label = train_label.to(torch.device(train_device))
 
         # print('train_input:',train_input.shape, 'train_label:',train_label.shape)
 
@@ -145,8 +145,8 @@ def train_one_epoch(training_loader, validation_loader,
         if len(valid_label.shape)==1:
           valid_label = valid_label.unsqueeze(dim=0)
 
-        valid_input = valid_input.to(torch.device('cuda'))
-        valid_label = valid_label.to(torch.device('cuda'))
+        valid_input = valid_input.to(torch.device(train_device))
+        valid_label = valid_label.to(torch.device(train_device))
 
         # Make predictions for this batch
         valid_output, temp = model(valid_input)
@@ -171,7 +171,7 @@ def train_epochs(training_loader, validation_loader,
                   optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
                   loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
                   epochs = 50, resume=False, early_stop_thresh = 5,
-                  device='cuda'):
+                  train_device='cuda'):
 
 
   epochs = 50
@@ -205,7 +205,7 @@ def train_epochs(training_loader, validation_loader,
                       num_filters=num_filters, model_type=model_type,
                       model=model, optimizer=optimizer,
                       loss_fn=loss_fn, loss_fn2=loss_fn2,
-                      lambda1=lambda1, lambda2=lambda2, device=train_device)
+                      lambda1=lambda1, lambda2=lambda2, train_device=train_device)
 
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {train_loss/len(training_loader)}")
 
