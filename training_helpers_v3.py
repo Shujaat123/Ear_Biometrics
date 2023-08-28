@@ -261,14 +261,14 @@ def train_folds(dataset, k_folds, input_shape=(351, 246, 3),
     test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
 
     # Define data loaders for training and testing data in this fold
-    trainloader = torch.utils.data.DataLoader(dataset, batch_size=10, 
+    training_loader = torch.utils.data.DataLoader(dataset, batch_size=10, 
                                               sampler=train_subsampler)
-    testloader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+    validation_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
                                              sampler=test_subsampler)
 
     # Added by Atif
-    training_samples = training_loader.dataset.tensors[0]
-    training_targets = training_loader.dataset.tensors[1]
+    num_training_samples = len(training_loader.dataset)
+    num_validation_samples = len(validation_loader.dataset)
 
     # Reset model weights before each fold
     model.apply(reset_weights)
