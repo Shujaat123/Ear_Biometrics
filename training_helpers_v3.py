@@ -175,7 +175,7 @@ def train_epochs(training_loader, validation_loader,
                   train_device='cuda'):
 
 
-  epochs = 50
+  #epochs = 50
   #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
   best_validation_accuracy = -1
