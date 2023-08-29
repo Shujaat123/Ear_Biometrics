@@ -182,7 +182,7 @@ def train_epochs(training_loader, validation_loader,
   best_validation_epoch = -1
 
   for epoch in range(epochs):
-    print('EPOCH {}:'.format(epoch))
+    print('EPOCH {}/{}:'.format(epoch,epochs))
     # if (epoch<3):
     #   lambda1=0
     # elif ((epoch>=3)&(epoch<10)):
