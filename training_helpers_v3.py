@@ -221,7 +221,7 @@ def train_epochs(training_loader, validation_loader,
         print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
         break  # terminate the training loop
 
-    #return best_validation_accuracy
+  return best_validation_accuracy
 
 def reset_weights(m):
   '''
