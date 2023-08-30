@@ -165,16 +165,19 @@ def train_one_epoch(training_loader, validation_loader,
 
     return train_loss, training_accuracy, valid_loss, validation_accuracy
 
-def train_epochs(training_loader, validation_loader,
-                  num_training_samples, num_validation_samples,
-                  input_shape=(351, 246, 3), num_classes=100, num_filters=8,
-                  model_type='Encoder+Classifier', model=None,
-                  optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
-                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                  epochs = 50, resume=False, early_stop_thresh = 5,
-                  train_device='cuda'):
+def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3), 
+                 num_classes=100, num_filters=8, model_type='Encoder+Classifier', 
+                 model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
+                 loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
+                 epochs = 50, resume=False, early_stop_thresh = 5, train_device='cuda'):
 
 
+  #data
+  training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
+  validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
+  # added by Atif
+  num_training_samples = len(training_loader.dataset)
+  num_validation_samples = len(validation_loader.dataset)
   #epochs = 50
   #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
