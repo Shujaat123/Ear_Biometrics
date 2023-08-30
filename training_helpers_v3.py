@@ -233,62 +233,62 @@ def reset_weights(m):
     print(f'Reset trainable parameters of layer = {layer}')
     layer.reset_parameters()
 
-def train_folds(dataset, k_folds, input_shape=(351, 246, 3), 
-                num_classes=100, num_filters=8,
-                model_type='Encoder+Classifier', model=None,
-                optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
-                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs_per_fold = 50, resume=False, early_stop_thresh = 5,
-                train_device='cuda'):
+#def train_folds(dataset, k_folds, input_shape=(351, 246, 3), 
+#                num_classes=100, num_filters=8,
+#                model_type='Encoder+Classifier', model=None,
+#                optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
+#                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
+#                epochs_per_fold = 50, resume=False, early_stop_thresh = 5,
+#                train_device='cuda'):
   
-  # Set fixed random number seed
-  torch.manual_seed(42)
-  # Define the K-fold Cross Validator
-  kfold = KFold(n_splits=k_folds, shuffle=True)
+#  # Set fixed random number seed
+#  torch.manual_seed(42)
+#  # Define the K-fold Cross Validator
+#  kfold = KFold(n_splits=k_folds, shuffle=True)
 
-  # For k fold results
-  results = {}
+#  # For k fold results
+#  results = {}
 
-  # K-fold Cross Validation model evaluation
-  for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)):
+#  # K-fold Cross Validation model evaluation
+#  for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)):
+#
+#    # Print
+#    print(f'FOLD {fold}')
+#    print('--------------------------------')
 
-    # Print
-    print(f'FOLD {fold}')
-    print('--------------------------------')
+#    # Sample elements randomly from a given list of ids, no replacement.
+#    train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
+#    test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
 
-    # Sample elements randomly from a given list of ids, no replacement.
-    train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
-    test_subsampler = torch.utils.data.SubsetRandomSampler(test_ids)
+#    # Define data loaders for training and testing data in this fold
+#    training_loader = torch.utils.data.DataLoader(dataset, batch_size=10, 
+#                                              sampler=train_subsampler)
+#    validation_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
+#                                             sampler=test_subsampler)
 
-    # Define data loaders for training and testing data in this fold
-    training_loader = torch.utils.data.DataLoader(dataset, batch_size=10, 
-                                              sampler=train_subsampler)
-    validation_loader = torch.utils.data.DataLoader(dataset, batch_size=1, 
-                                             sampler=test_subsampler)
+#    # Added by Atif
+#    num_training_samples = len(training_loader.dataset)
+#    num_validation_samples = len(validation_loader.dataset)
 
-    # Added by Atif
-    num_training_samples = len(training_loader.dataset)
-    num_validation_samples = len(validation_loader.dataset)
-
-    # Reset model weights before each fold
-    model.apply(reset_weights)
-    best_validation_accuracy = train_epochs(training_loader, validation_loader, 
-                 num_training_samples, num_validation_samples, 
-                 input_shape=input_shape, num_classes=num_classes, 
-                 num_filters=num_filters, model_type=model_type, 
-                 model=model, optimizer=optimizer, loss_fn=loss_fn, 
-                 loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2, 
-                 epochs = epochs_per_fold, resume=resume, 
-                 early_stop_thresh = early_stop_thresh, 
-                 train_device=train_device)
+#    # Reset model weights before each fold
+#    model.apply(reset_weights)
+#    best_validation_accuracy = train_epochs(training_loader, validation_loader, 
+#                 num_training_samples, num_validation_samples, 
+#                 input_shape=input_shape, num_classes=num_classes, 
+#                 num_filters=num_filters, model_type=model_type, 
+#                 model=model, optimizer=optimizer, loss_fn=loss_fn, 
+#                 loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2, 
+#                 epochs = epochs_per_fold, resume=resume, 
+#                 early_stop_thresh = early_stop_thresh, 
+#                 train_device=train_device)
     
-    results[fold] = best_validation_accuracy
+#    results[fold] = best_validation_accuracy
 
-  # Print fold results
-  print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
-  print('--------------------------------')
-  sum = 0.0
-  for key, value in results.items():
-    print(f'Fold {key}: {value} %')
-    sum += value
-  print(f'Average: {sum/len(results.items())} %')
+#  # Print fold results
+#  print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
+#  print('--------------------------------')
+#  sum = 0.0
+#  for key, value in results.items():
+#    print(f'Fold {key}: {value} %')
+#    sum += value
+#  print(f'Average: {sum/len(results.items())} %')
