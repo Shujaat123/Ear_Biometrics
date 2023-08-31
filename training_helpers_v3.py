@@ -5,7 +5,7 @@ import torch.nn
 import torch.nn.functional
 import torch.optim
 from torchvision import models #just for debugging
-from  sklearn.model_selection import train_test_split, StratifiedShuffleSplit, ShuffleSplit, KFold # KFold is added by Atif
+from  sklearn.model_selection import train_test_split, StratifiedShuffleSplit, ShuffleSplit, StratifiedKFold, KFold # KFold is added by Atif
 
 def to_categorical(y, num_classes):
     """ 1-hot encodes a tensor """
@@ -247,7 +247,8 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   # Set fixed random number seed
   #torch.manual_seed(42)
   # Define the K-fold Cross Validator
-  kfold = StratifiedShuffleSplit(n_splits=k_folds,test_size=0.142, random_state=42)
+  #kfold = StratifiedShuffleSplit(n_splits=k_folds,test_size=0.142, random_state=42)
+  kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
   #kfold = KFold(n_splits=k_folds)
   print(f"kfold: {kfold}")
 
