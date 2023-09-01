@@ -14,12 +14,16 @@ def to_categorical(y, num_classes):
 # added by Atif
 def checkpoint(model, optimizer, filename, 
                best_validation_accuracy, 
+               best_validation_trail,
+               best_validation_fold,
                best_validation_epoch, 
                training_accuracy):
   torch.save({
     'optimizer': optimizer.state_dict(),
     'model': model.state_dict(),
     'best_validation_accuracy': best_validation_accuracy, 
+    'best_validation_trail': best_validation_epoch,
+    'best_validation_fold': best_validation_epoch,
     'best_validation_epoch': best_validation_epoch,
     'training_accuracy_corresponding_to_best_validation_accuracy': training_accuracy
   }, filename)
@@ -29,8 +33,10 @@ def resume(model, optimizer, filename):
   model.load_state_dict(checkpoint['model'])
   optimizer.load_state_dict(checkpoint['optimizer'])
   best_validation_accuracy = checkpoint['best_validation_accuracy']
+  best_validation_trail = checkpoint['best_validation_trail']
+  best_validation_fold = checkpoint['best_validation_fold']
   best_validation_epoch = checkpoint['best_validation_epoch']
-  return best_validation_accuracy, best_validation_epoch
+  return best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch
 
 # manaul training
 def train_one_epoch(training_loader, validation_loader,
@@ -180,12 +186,13 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
                  resume_from=None, resume_trail=0, resume_fold=0, resume_epoch=0, 
-                 best_validation_accuracy=0, best_validation_epoch=0):
+                 best_validation_accuracy=0, best_validation_trail=0, 
+                 best_validation_fold=0, best_validation_epoch=0):
 
 
   #resume
   if not resume_from == None:
-      best_validation_accuracy, best_validation_epoch = resume(model, optimizer, resume_from)
+      best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch = resume(model, optimizer, resume_from)
   
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
