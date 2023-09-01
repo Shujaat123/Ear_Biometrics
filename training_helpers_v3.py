@@ -12,16 +12,25 @@ def to_categorical(y, num_classes):
     return np.eye(num_classes, dtype='uint8')[y]
 
 # added by Atif
-def checkpoint(model, optimizer, filename):
+def checkpoint(model, optimizer, filename, 
+               best_validation_accuracy, 
+               best_validation_epoch, 
+               training_accuracy):
   torch.save({
     'optimizer': optimizer.state_dict(),
     'model': model.state_dict(),
+    'best_validation_accuracy': best_validation_accuracy, 
+    'best_validation_epoch': best_validation_epoch,
+    'training_accuracy_corresponding_to_best_validation_accuracy': training_accuracy
   }, filename)
 
 def resume(model, optimizer, filename):
   checkpoint = torch.load(filename)
   model.load_state_dict(checkpoint['model'])
   optimizer.load_state_dict(checkpoint['optimizer'])
+  best_validation_accuracy = checkpoint['best_validation_accuracy']
+  best_validation_epoch = checkpoint['best_validation_epoch']
+  return best_validation_accuracy, best_validation_epoch
 
 # manaul training
 def train_one_epoch(training_loader, validation_loader,
@@ -169,9 +178,14 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  num_classes=100, num_filters=8, model_type='Encoder+Classifier', 
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
-                 epochs = 50, resume=False, early_stop_thresh = 5, train_device='cuda'):
+                 epochs = 50, early_stop_thresh = 5, train_device='cuda', 
+                 resume_from=None, resume_trail=0, resume_fold=0, resume_epoch=0, 
+                 best_validation_accuracy=0, best_validation_epoch = 0):
 
 
+  #resume
+  if not resume_from == None:
+      best_validation_accuracy, best_validation_epoch = resume(model, optimizer, resume_from)
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
@@ -181,10 +195,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
   #epochs = 50
   #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-  best_validation_accuracy = -1
-  best_validation_epoch = -1
-
-  for epoch in range(epochs):
+  for epoch in range(resume_epoch, epochs):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     # if (epoch<3):
     #   lambda1=0
@@ -218,7 +229,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
     if validation_accuracy > best_validation_accuracy:
       best_validation_accuracy = validation_accuracy
       best_validation_epoch = epoch
-      checkpoint(model, optimizer, "best_model.pth")
+      checkpoint(model, optimizer, "best_model.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
 
     elif epoch - best_validation_epoch > early_stop_thresh:
         print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
