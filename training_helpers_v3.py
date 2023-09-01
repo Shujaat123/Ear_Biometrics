@@ -180,12 +180,13 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
                  resume_from=None, resume_trail=0, resume_fold=0, resume_epoch=0, 
-                 best_validation_accuracy=0, best_validation_epoch = 0):
+                 best_validation_accuracy=0, best_validation_epoch=0):
 
 
   #resume
   if not resume_from == None:
       best_validation_accuracy, best_validation_epoch = resume(model, optimizer, resume_from)
+  
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
@@ -226,14 +227,22 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
 
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {valid_loss/len(validation_loader)}")
 
-    if validation_accuracy > best_validation_accuracy:
-      best_validation_accuracy = validation_accuracy
-      best_validation_epoch = epoch
-      checkpoint(model, optimizer, "best_model.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
+    if validation_accuracy > best_validation_accuracy: 
+        best_validation_accuracy = validation_accuracy 
+        best_validation_epoch = epoch 
+        # creating the latest checkpoint
+        checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
+        # creating the best checkpoint
+        checkpoint(model, optimizer, "best_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
 
     elif epoch - best_validation_epoch > early_stop_thresh:
         print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
+        # creating the latest checkpoint
+        checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
         break  # terminate the training loop
+    
+    # creating the latest checkpoint
+    checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
 
   return best_validation_accuracy
 
