@@ -173,7 +173,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, best_validation_accuracy=0, trail=1, fold=1, epoch = 1):
+                 resume_from=None, results=np.empty([0]), best_validation_accuracy=0, trail=0, fold=0, epoch = 1):
                      
   #resume
   if not resume_from == None:
@@ -221,6 +221,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
             'fold': fold,
             'epoch': epoch,
             'bast_validation_accuracy': bast_validation_accuracy,
+            'results': results,
         }
         checkpoint(best_checkpoint, "best_checkpoint.pth")
     
@@ -233,7 +234,8 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
         'trail': trail, 
         'fold': fold,
         'epoch': epoch,
-        'bast_validation_accuracy': bast_validation_accuracy,        
+        'bast_validation_accuracy': bast_validation_accuracy,
+        'results': results,
     }
     checkpoint(latest_checkpoint, "latest_checkpoint.pth")
       
