@@ -245,7 +245,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
     if thresh_epoch >= early_stop_thresh:
         print(f"Early stopped training at epoch {epoch}. \nThe best vaidation accuarcy was {best_validation_accuracy}")
         break  # terminate the training loop
-    thresh_epoch++
+    thresh_epoch+=1
     
   return best_validation_accuracy
 
