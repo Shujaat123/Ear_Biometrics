@@ -221,7 +221,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
             'trail': trail, 
             'fold': fold,
             'epoch': epoch,
-            'bast_validation_accuracy': bast_validation_accuracy,
+            'best_validation_accuracy': best_validation_accuracy,
             'results': results,
         }
         checkpoint(best_checkpoint, "best_checkpoint.pth")
@@ -235,7 +235,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
         'trail': trail, 
         'fold': fold,
         'epoch': epoch,
-        'bast_validation_accuracy': bast_validation_accuracy,
+        'best_validation_accuracy': best_validation_accuracy,
         'results': results,
     }
     checkpoint(latest_checkpoint, "latest_checkpoint.pth")
