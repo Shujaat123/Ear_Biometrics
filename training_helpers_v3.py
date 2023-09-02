@@ -302,7 +302,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
 
     # Reset model weights before each fold
     model.apply(reset_weights)
-    best_validation_accuracy = train_epochs(X_train, y_train, X_test, y_test, 
+    best_val_acc = train_epochs(X_train, y_train, X_test, y_test, 
                                             input_shape=input_shape, 
                                             num_classes=num_classes, 
                                             num_filters=num_filters, 
@@ -315,7 +315,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                                             early_stop_thresh=early_stop_thresh, 
                                             train_device=train_device)
 
-    results[fold] = best_validation_accuracy
+    results[fold] = best_val_acc
 
   # Print fold results
   print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
@@ -324,9 +324,10 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   for key, value in results.items():
     print(f'Fold {key}: {value} %')
     sum += value
-  print(f'Average: {sum/k_folds} %')
+  k_folds_avg_val_acc = sum/k_folds
+  print(f'Average: {k_folds_avg_val_acc} %')
   
-  return best_validation_accuracy
+  return k_folds_avg_val_acc, best_val_acc
 
 def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 num_classes=100, num_filters=8, model_type='Encoder+Classifier',
@@ -344,14 +345,14 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
   for trail in range(trail, n_trails):
     print(f"Trail: {trail}")
     X, y = shuffle(ear_images, sub_labels, random_state=42)
-    best_validation_accuracy = train_folds(X, y, k_folds, input_shape=input_shape,
+    k_folds_avg_val_acc, best_val_acc = train_folds(X, y, k_folds, input_shape=input_shape,
               num_classes=num_classes, num_filters=num_filters,
               model_type=model_type, model=model,
               optimizer=optimizer, loss_fn=loss_fn,
               loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
               epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
               train_device=train_device)
-    results[trail] = best_validation_accuracy
+    results[trail] = k_folds_avg_val_acc
 
   # Print fold results
   print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
@@ -360,5 +361,6 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
   for key, value in results.items():
     print(f'Fold {key}: {value} %')
     sum += value
-  print(f'Average: {sum/n_trails} %')
+  n_trails_avg_val_acc = sum/n_trails
+  print(f'Average: {n_trails_avg_val_acc} %')
   
