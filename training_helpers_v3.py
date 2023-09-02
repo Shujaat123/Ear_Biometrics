@@ -6,6 +6,7 @@ import torch.nn.functional
 import torch.optim
 from torchvision import models #just for debugging
 from  sklearn.model_selection import train_test_split, StratifiedShuffleSplit, ShuffleSplit, StratifiedKFold, KFold # KFold is added by Atif
+from sklearn.utils import shuffle
 
 def to_categorical(y, num_classes):
     """ 1-hot encodes a tensor """
