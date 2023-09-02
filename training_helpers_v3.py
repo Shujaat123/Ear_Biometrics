@@ -317,7 +317,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                                             epochs=epochs_per_fold, 
                                             early_stop_thresh=early_stop_thresh, 
                                             train_device=train_device, 
-                                            resume_from=resume, results=results, 
+                                            resume_from=resume_from, results=results, 
                                             best_validation_accuracy=best_validation_accuracy, 
                                             trail=trail, fold=fold, epoch=epoch)
 
