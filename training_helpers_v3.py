@@ -11,20 +11,6 @@ def to_categorical(y, num_classes):
     """ 1-hot encodes a tensor """
     return np.eye(num_classes, dtype='uint8')[y]
 
-# added by Atif
-def checkpoint(current_checkpoint, filename):
-  torch.save(current_checkpoint, filename)
-
-#def resume(model, optimizer, filename):
-#  checkpoint = torch.load(filename)
-#  model.load_state_dict(checkpoint['model'])
-#  optimizer.load_state_dict(checkpoint['optimizer'])
-#  best_validation_accuracy = checkpoint['best_validation_accuracy']
-#  best_validation_trail = checkpoint['best_validation_trail']
-#  best_validation_fold = checkpoint['best_validation_fold']
-  best_validation_epoch = checkpoint['best_validation_epoch']
-  return best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch
-
 # manaul training
 def train_one_epoch(training_loader, validation_loader,
                     num_training_samples, num_validation_samples,
@@ -167,6 +153,21 @@ def train_one_epoch(training_loader, validation_loader,
 
     return train_loss, training_accuracy, valid_loss, validation_accuracy
 
+# added by Atif
+def checkpoint(current_checkpoint, filename):
+  torch.save(current_checkpoint, filename)
+
+#def resume(model, optimizer, filename):
+#  checkpoint = torch.load(filename)
+#  model.load_state_dict(checkpoint['model'])
+#  optimizer.load_state_dict(checkpoint['optimizer'])
+#  best_validation_accuracy = checkpoint['best_validation_accuracy']
+#  best_validation_trail = checkpoint['best_validation_trail']
+#  best_validation_fold = checkpoint['best_validation_fold']
+#  best_validation_epoch = checkpoint['best_validation_epoch']
+#  return best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch
+
+
 def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3), 
                  num_classes=100, num_filters=8, model_type='Encoder+Classifier', 
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
@@ -277,11 +278,9 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   # Define the K-fold Cross Validator
   #kfold = StratifiedShuffleSplit(n_splits=k_folds,test_size=0.142, random_state=42)
   kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
-  #kfold = KFold(n_splits=k_folds)
-  print(f"kfold: {kfold}")
 
   # For k fold results
-  results = {}
+  k_folds_results = {}
 
   # K-fold Cross Validation model evaluation
   for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
@@ -315,13 +314,13 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                                             early_stop_thresh=early_stop_thresh, 
                                             train_device=train_device)
 
-    results[fold] = best_val_acc
+    k_folds_results[fold] = best_val_acc
 
   # Print fold results
   print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
   print('--------------------------------')
   sum = 0.0
-  for key, value in results.items():
+  for key, value in k_folds_results.items():
     print(f'Fold {key}: {value} %')
     sum += value
   k_folds_avg_val_acc = sum/k_folds
@@ -338,8 +337,20 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
                 resume_from=None, train_device='cuda'):
 
   trail = 0
+
+  #resume
+  if not resume_from == None:
+      resume_checkpoint = torch.load(resume_from)
+      trail = resume_checkpoint['trail']
+      fold = resume_checkpoint['fold']
+      epoch = resume_checkpoint['epoch']
+      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
+      # load model and optimizer 
+      model.load_state_dict(checkpoint['model'])
+      optimizer.load_state_dict(checkpoint['optimizer'])
+      
   # For N trail results
-  results = {}
+  n_trails_results = {}
 
   # N-trail Cross Validation model evaluation
   for trail in range(trail, n_trails):
@@ -352,13 +363,13 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
               loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
               epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
               train_device=train_device)
-    results[trail] = k_folds_avg_val_acc
+    n_trail_results[trail] = k_folds_avg_val_acc
 
   # Print fold results
   print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
   print('--------------------------------')
   sum = 0.0
-  for key, value in results.items():
+  for key, value in n_trails_results.items():
     print(f'Fold {key}: {value} %')
     sum += value
   n_trails_avg_val_acc = sum/n_trails
