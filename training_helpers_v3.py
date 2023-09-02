@@ -172,24 +172,19 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, best_validation_accuracy=0, best_validation_trail=0, 
-                 best_validation_fold=0, best_validation_epoch=0):
-
-
+                 resume_from=None, best_validation_accuracy=0, trail=0, fold=0, epoch = 0):
+                     
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
       trail = resume_checkpoint['trail']
       fold = resume_checkpoint['fold']
-      resume_epoch = resume_checkpoint['epoch']
+      epoch = resume_checkpoint['epoch']
+      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
       # load model and optimizer 
       model.load_state_dict(checkpoint['model'])
       optimizer.load_state_dict(checkpoint['optimizer'])
-  else:  
-      trail = 0
-      fold = 0
-      resume_epoch = 0
-      
+  
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
@@ -197,7 +192,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
 
-  for epoch in range(resume_epoch, epochs):
+  for epoch in range(epoch, epochs):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     train_loss, training_accuracy, valid_loss, validation_accuracy = \
       train_one_epoch(training_loader, validation_loader,
@@ -221,8 +216,10 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
             'optimizer': optimizer.state_dict(),
             'training_accuracy': training_accuracy,
             'validation_accuracy': validation_accuracy, 
-            'trail': trail, 'fold': fold,
+            'trail': trail, 
+            'fold': fold,
             'epoch': epoch,
+            'bast_validation_accuracy': bast_validation_accuracy,
         }
         checkpoint(best_checkpoint, "best_checkpoint.pth")
     
@@ -235,6 +232,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
         'trail': trail, 
         'fold': fold,
         'epoch': epoch,
+        'bast_validation_accuracy': bast_validation_accuracy,        
     }
     checkpoint(latest_checkpoint, "latest_checkpoint.pth")
       
@@ -259,9 +257,21 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 model=None, optimizer=None, 
                 loss_fn = torch.nn.CrossEntropyLoss(), 
                 loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs_per_fold = 50, resume=False, early_stop_thresh = 5,
-                train_device='cuda'):
+                epochs_per_fold = 50, early_stop_thresh = 5, train_device='cuda', 
+                resume_from=None, best_validation_accuracy=0, trail=0, fold=0, epoch = 0):
 
+  
+  #resume
+  if not resume_from == None:
+      resume_checkpoint = torch.load(resume_from)
+      trail = resume_checkpoint['trail']
+      fold = resume_checkpoint['fold']
+      epoch = resume_checkpoint['epoch']
+      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
+      # load model and optimizer 
+      model.load_state_dict(checkpoint['model'])
+      optimizer.load_state_dict(checkpoint['optimizer'])
+  
   # Set fixed random number seed
   #torch.manual_seed(42)
   # Define the K-fold Cross Validator
@@ -314,4 +324,41 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   for key, value in results.items():
     print(f'Fold {key}: {value} %')
     sum += value
-  print(f'Average: {sum/len(results.items())} %')
+  print(f'Average: {sum/k_folds} %')
+  
+  return best_validation_accuracy
+
+def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
+                num_classes=100, num_filters=8, model_type='Encoder+Classifier',
+                model=None, optimizer=None,
+                loss_fn = torch.nn.CrossEntropyLoss(),
+                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
+                epochs_per_fold = 50, early_stop_thresh = 5,
+                resume_from=None, train_device='cuda'):
+
+  trail = 0
+  # For N trail results
+  results = {}
+
+  # N-trail Cross Validation model evaluation
+  for trail in range(trail, n_trails):
+    print(f"Trail: {trail}")
+    X, y = shuffle(ear_images, sub_labels, random_state=42)
+    best_validation_accuracy = train_folds(X, y, k_folds, input_shape=input_shape,
+              num_classes=num_classes, num_filters=num_filters,
+              model_type=model_type, model=model,
+              optimizer=optimizer, loss_fn=loss_fn,
+              loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
+              epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
+              train_device=train_device)
+    results[trail] = best_validation_accuracy
+
+  # Print fold results
+  print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
+  print('--------------------------------')
+  sum = 0.0
+  for key, value in results.items():
+    print(f'Fold {key}: {value} %')
+    sum += value
+  print(f'Average: {sum/n_trails} %')
+  
