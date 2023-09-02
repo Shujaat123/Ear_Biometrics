@@ -173,7 +173,8 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, results=np.empty([0]), best_validation_accuracy=0, trail=0, fold=0, epoch = 1):
+                 resume_from=None, results=np.empty([0]), 
+                 best_validation_accuracy=0, trail=0, fold=0, epoch = 1):
                      
   #resume
   if not resume_from == None:
@@ -305,41 +306,40 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
 
     # Reset model weights before each fold
     model.apply(reset_weights)
-    best_val_acc = train_epochs(X_train, y_train, X_test, y_test, 
+    best_validation_accuracy = train_epochs(X_train, y_train, X_test, y_test, 
                                             input_shape=input_shape, 
                                             num_classes=num_classes, 
                                             num_filters=num_filters, 
-                                            model_type=model_type, model=model, 
-                                            optimizer=optimizer, loss_fn=loss_fn, 
-                                            loss_fn2=loss_fn2, lambda1=lambda1, 
-                                            lambda2=lambda2, 
-                                            epochs=epochs_per_fold, results,
-                                            resume=resume, 
+                                            model_type=model_type, 
+                                            model=model, optimizer=optimizer, 
+                                            loss_fn=loss_fn, loss_fn2=loss_fn2, 
+                                            lambda1=lambda1, lambda2=lambda2, 
+                                            epochs=epochs_per_fold, 
                                             early_stop_thresh=early_stop_thresh, 
-                                            train_device=train_device)
+                                            train_device=train_device, 
+                                            resume_from=resume, results=results, 
+                                            best_validation_accuracy=best_validation_accuracy, 
+                                            trail=trail, fold=fold, epoch=epoch)
 
-    
-    print(f'Fold {fold}: {best_val_acc} %')
-    sum += best_val_acc
+    print(f'Fold {fold}: {best_validation_accuracy} %')
+    sum += best_validation_accuracy
     if trail== 0:
-        results[fold] = best_val_acc
+        results[fold] = best_validation_accuracy
     else:
-        results[trail,fold] = best_val_acc
+        results[trail,fold] = best_validation_accuracy
   
   print(f'Average: {sum/k_folds} %')
   
-  return best_val_acc
+  return best_validation_accuracy
 
 def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 num_classes=100, num_filters=8, model_type='Encoder+Classifier',
-                model=None, optimizer=None,
-                loss_fn = torch.nn.CrossEntropyLoss(),
+                model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
                 loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
                 epochs_per_fold = 50, early_stop_thresh = 5,
                 resume_from=None, train_device='cuda'):
 
   trail = 1
-
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
@@ -350,6 +350,11 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
       # load model and optimizer 
       model.load_state_dict(checkpoint['model'])
       optimizer.load_state_dict(checkpoint['optimizer'])
+  else:
+      trail = 1
+      fold = 1
+      epoch = 1
+      best_validation_accuracy = 0
       
   # For N trail results
   results = np.zeros((n_trails, k_folds))
@@ -362,13 +367,17 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
   for trail in range(trail, n_trails+1):
     print(f"Trail: {trail}")
     X, y = shuffle(ear_images, sub_labels, random_state=42)
-    best_val_acc = train_folds(X, y, k_folds, input_shape=input_shape,
-              num_classes=num_classes, num_filters=num_filters,
-              model_type=model_type, model=model,
-              optimizer=optimizer, loss_fn=loss_fn,
-              loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
-              epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
-              train_device=train_device)
+    best_val_acc = train_folds(X, y, k_folds, input_shape=input_shape, 
+                               num_classes=num_classes, num_filters=num_filters, 
+                               model_type=model_type, model=model, 
+                               optimizer=optimizer, loss_fn=loss_fn, 
+                               loss_fn2=loss_fn2, lambda1=lambda1, 
+                               lambda2=lambda2, epochs_per_fold = epochs_per_fold, 
+                               early_stop_thresh = early_stop_thresh, 
+                               train_device=train_device, resume_from=resume, 
+                               best_validation_accuracy=best_validation_accuracy, 
+                               trail=trail, fold=fold, epoch=epoch)
+
     print(f'Trail {trail}: {np.sum(results[trail])} %')
     sum += np.sum(results[trail])
 
