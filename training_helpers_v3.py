@@ -237,20 +237,33 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
     if validation_accuracy > best_validation_accuracy: 
         best_validation_accuracy = validation_accuracy 
         best_validation_epoch = epoch 
-        # creating the latest checkpoint
-        checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
         # creating the best checkpoint
-        checkpoint(model, optimizer, "best_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
-
-    elif epoch - best_validation_epoch > early_stop_thresh:
-        print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
-        # creating the latest checkpoint
-        checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
-        break  # terminate the training loop
+        best_checkpoint = { 
+            'model': model.state_dict(), 
+            'optimizer': optimizer.state_dict(),
+            'training_accuracy': training_accuracy,
+            'validation_accuracy': validation_accuracy, 
+            'trail': trail, 'fold': fold,
+            'epoch': epoch,
+        }
+        checkpoint(best_checkpoint, "best_checkpoint.pth")
     
     # creating the latest checkpoint
-    checkpoint(model, optimizer, "latest_checkpoint.pth", best_validation_accuracy, best_validation_epoch, training_accuracy)
-
+    latest_checkpoint = { 
+        'model': model.state_dict(), 
+        'optimizer': optimizer.state_dict(),
+        'training_accuracy': training_accuracy,
+        'validation_accuracy': validation_accuracy, 
+        'trail': trail, 
+        'fold': fold,
+        'epoch': epoch,
+    }
+    checkpoint(latest_checkpoint, "latest_checkpoint.pth")
+      
+    if epoch - best_validation_epoch > early_stop_thresh:
+        print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
+        break  # terminate the training loop
+        
   return best_validation_accuracy
 
 def reset_weights(m):
