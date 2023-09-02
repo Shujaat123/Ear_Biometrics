@@ -280,7 +280,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   if trail== 0:
       results = np.zeros(k_folds)
 
-  # Print fold results
+  # Print k-fold results
   print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
   print('--------------------------------')
   sum = 0.0
@@ -352,6 +352,10 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
   # For N trail results
   results = np.zeros((n_trails, k_folds))
 
+  # Print N trail results
+  print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
+  print('--------------------------------')
+  sum = 0.0
   # N-trail Cross Validation model evaluation
   for trail in range(trail, n_trails+1):
     print(f"Trail: {trail}")
@@ -363,14 +367,12 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
               loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
               epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
               train_device=train_device)
+    sum += best_val_acc
 
-  # Print fold results
-  print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
-  print('--------------------------------')
-  sum = 0.0
-  for key, value in n_trails_results.items():
-    print(f'Fold {key}: {value} %')
-    sum += value
+  for trail in range(n_trails):
+      for fold in range(k_folds):
+        print(f'Fold {key}: {value} %')
+    
   n_trails_avg_val_acc = sum/n_trails
   print(f'Average: {n_trails_avg_val_acc} %')
   
