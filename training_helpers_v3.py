@@ -216,12 +216,12 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                                  'training_accuracy': training_accuracy, 
                                  'valid_loss': valid_loss, 
                                  'validation_accuracy': validation_accuracy}
-    elif trail== 0
+    elif trail== 0:
       results[fold-1][epoch-1]={'train_loss': train_loss, 
                                  'training_accuracy': training_accuracy, 
                                  'valid_loss': valid_loss, 
                                  'validation_accuracy': validation_accuracy}
-    else
+    else:
       results[trail-1][fold-1][epoch-1]={'train_loss': train_loss, 
                                  'training_accuracy': training_accuracy, 
                                  'valid_loss': valid_loss, 
