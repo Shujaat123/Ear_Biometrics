@@ -367,12 +367,8 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
               loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
               epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
               train_device=train_device)
-    sum += best_val_acc
+    print(f'Trail {trail}: {np.sum(results[trail])} %')
+    sum += np.sum(results[trail])
 
-  for trail in range(n_trails):
-      for fold in range(k_folds):
-        print(f'Fold {key}: {value} %')
-    
-  n_trails_avg_val_acc = sum/n_trails
-  print(f'Average: {n_trails_avg_val_acc} %')
+  print(f'Average: {sum/n_trails} %')
   
