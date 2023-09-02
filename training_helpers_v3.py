@@ -262,7 +262,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 loss_fn = torch.nn.CrossEntropyLoss(), 
                 loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
                 epochs_per_fold = 50, early_stop_thresh = 5, train_device='cuda', 
-                resume_from=None, best_validation_accuracy=0, trail=0, fold=0, epoch = 0):
+                resume_from=None, best_validation_accuracy=0, trail=0, fold=1, epoch = 1):
 
   
   #resume
