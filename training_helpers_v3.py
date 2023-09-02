@@ -173,7 +173,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, best_validation_accuracy=0, trail=0, fold=0, epoch = 0):
+                 resume_from=None, best_validation_accuracy=0, trail=1, fold=1, epoch = 1):
                      
   #resume
   if not resume_from == None:
@@ -193,7 +193,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
 
-  for epoch in range(epoch, epochs):
+  for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     train_loss, training_accuracy, valid_loss, validation_accuracy = \
       train_one_epoch(training_loader, validation_loader,
@@ -274,14 +274,16 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
       optimizer.load_state_dict(checkpoint['optimizer'])
   
   # Set fixed random number seed
-  #torch.manual_seed(42)
-  # Define the K-fold Cross Validator
-  #kfold = StratifiedShuffleSplit(n_splits=k_folds,test_size=0.142, random_state=42)
   kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
 
   # For k fold results
-  k_folds_results = {}
+  if trail== 0:
+      results = np.zeros(k_folds)
 
+  # Print fold results
+  print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
+  print('--------------------------------')
+  sum = 0.0
   # K-fold Cross Validation model evaluation
   for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
 
@@ -314,21 +316,19 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                                             early_stop_thresh=early_stop_thresh, 
                                             train_device=train_device)
 
-    k_folds_results[fold] = best_val_acc
-
-  # Print fold results
-  print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
-  print('--------------------------------')
-  sum = 0.0
-  for key, value in k_folds_results.items():
-    print(f'Fold {key}: {value} %')
-    sum += value
-  k_folds_avg_val_acc = sum/k_folds
-  print(f'Average: {k_folds_avg_val_acc} %')
+    
+    print(f'Fold {fold}: {best_val_acc} %')
+    sum += best_val_acc
+    if trail== 0:
+        results[fold] = best_val_acc
+    else:
+        results[trail][fold] = best_val_acc
   
-  return k_folds_avg_val_acc, best_val_acc
+  print(f'Average: {sum/k_folds} %')
+  
+  return best_val_acc
 
-def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
+def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 num_classes=100, num_filters=8, model_type='Encoder+Classifier',
                 model=None, optimizer=None,
                 loss_fn = torch.nn.CrossEntropyLoss(),
@@ -336,7 +336,7 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
                 epochs_per_fold = 50, early_stop_thresh = 5,
                 resume_from=None, train_device='cuda'):
 
-  trail = 0
+  trail = 1
 
   #resume
   if not resume_from == None:
@@ -350,20 +350,19 @@ def train_ntrails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 2
       optimizer.load_state_dict(checkpoint['optimizer'])
       
   # For N trail results
-  n_trails_results = {}
+  results = np.zeros((n_trails, k_folds))
 
   # N-trail Cross Validation model evaluation
-  for trail in range(trail, n_trails):
+  for trail in range(trail, n_trails+1):
     print(f"Trail: {trail}")
     X, y = shuffle(ear_images, sub_labels, random_state=42)
-    k_folds_avg_val_acc, best_val_acc = train_folds(X, y, k_folds, input_shape=input_shape,
+    best_val_acc = train_folds(X, y, k_folds, input_shape=input_shape,
               num_classes=num_classes, num_filters=num_filters,
               model_type=model_type, model=model,
               optimizer=optimizer, loss_fn=loss_fn,
               loss_fn2=loss_fn2, lambda1=lambda1, lambda2=lambda2,
               epochs_per_fold = epochs_per_fold, resume=resume, early_stop_thresh = early_stop_thresh,
               train_device=train_device)
-    n_trail_results[trail] = k_folds_avg_val_acc
 
   # Print fold results
   print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
