@@ -207,6 +207,10 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                       loss_fn=loss_fn, loss_fn2=loss_fn2,
                       lambda1=lambda1, lambda2=lambda2, train_device=train_device)
 
+    results[trail][fold][epoch]={'train_loss': train_loss, 
+                                 'training_accuracy': training_accuracy, 
+                                 'valid_loss': valid_loss, 
+                                 'validation_accuracy': validation_accuracy}
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {train_loss/len(training_loader)}")
 
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {valid_loss/len(validation_loader)}")
