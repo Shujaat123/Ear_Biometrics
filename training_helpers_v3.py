@@ -311,7 +311,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                                             optimizer=optimizer, loss_fn=loss_fn, 
                                             loss_fn2=loss_fn2, lambda1=lambda1, 
                                             lambda2=lambda2, 
-                                            epochs=epochs_per_fold, 
+                                            epochs=epochs_per_fold, results,
                                             resume=resume, 
                                             early_stop_thresh=early_stop_thresh, 
                                             train_device=train_device)
@@ -322,7 +322,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
     if trail== 0:
         results[fold] = best_val_acc
     else:
-        results[trail][fold] = best_val_acc
+        results[trail,fold] = best_val_acc
   
   print(f'Average: {sum/k_folds} %')
   
