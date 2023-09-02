@@ -179,7 +179,8 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
 
   #resume
   if not resume_from == None:
-      best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch = resume(model, optimizer, resume_from)
+      resume_checkpoint = torch.load(resume_from)
+      # best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch
   
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
