@@ -194,6 +194,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
 
+  thresh_epoch = 1
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     train_loss, training_accuracy, valid_loss, validation_accuracy = \
@@ -211,7 +212,8 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
 
     if validation_accuracy > best_validation_accuracy: 
         best_validation_accuracy = validation_accuracy 
-        best_validation_epoch = epoch 
+        thresh_epoch = 1
+        #best_validation_epoch = epoch 
         # creating the best checkpoint
         best_checkpoint = { 
             'model': model.state_dict(), 
@@ -240,10 +242,11 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
     }
     checkpoint(latest_checkpoint, "latest_checkpoint.pth")
       
-    if epoch - best_validation_epoch > early_stop_thresh:
-        print(f"Early stopped training at epoch {epoch}. \nThe epoch of best vaidation accuarcy was {best_validation_epoch} with vaidation accuarcy of {best_validation_accuracy}")
+    if thresh_epoch >= early_stop_thresh:
+        print(f"Early stopped training at epoch {epoch}. \nThe best vaidation accuarcy was {best_validation_accuracy}")
         break  # terminate the training loop
-        
+    thresh_epoch++
+    
   return best_validation_accuracy
 
 def reset_weights(m):
