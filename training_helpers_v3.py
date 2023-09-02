@@ -172,48 +172,33 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
                  model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
                  loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
                  epochs = 50, early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, resume_trail=0, resume_fold=0, resume_epoch=0, 
-                 best_validation_accuracy=0, best_validation_trail=0, 
+                 resume_from=None, best_validation_accuracy=0, best_validation_trail=0, 
                  best_validation_fold=0, best_validation_epoch=0):
 
 
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
-      resume_trail = resume_checkpoint['trail']
-      resume_fold = resume_checkpoint['fold']
+      trail = resume_checkpoint['trail']
+      fold = resume_checkpoint['fold']
       resume_epoch = resume_checkpoint['epoch']
       # load model and optimizer 
       model.load_state_dict(checkpoint['model'])
       optimizer.load_state_dict(checkpoint['optimizer'])
-  
+  else:  
+      trail = 0
+      fold = 0
+      resume_epoch = 0
+      
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
   # added by Atif
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
-  #epochs = 50
-  #optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
   for epoch in range(resume_epoch, epochs):
     print('EPOCH {}/{}:'.format(epoch,epochs))
-    # if (epoch<3):
-    #   lambda1=0
-    # elif ((epoch>=3)&(epoch<10)):
-    #   lambda1=0.2
-    # elif ((epoch>=10)&(epoch<20)):
-    #lambda1=0.5
-    #lambda2=0.5
-    # model_type='DeepLSE'
-    # model_type='AutoEncoder'
-    # model_type='Classifier'
-    #model_type='Encoder+Classifier'
-    # else:
-    #   lambda1=0.6
-    # lambda1=(1+epoch)/EPOCHS
-    # lambda1 = np.remainder(epoch,2)
-
     train_loss, training_accuracy, valid_loss, validation_accuracy = \
       train_one_epoch(training_loader, validation_loader,
                       num_training_samples, num_validation_samples,
