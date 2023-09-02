@@ -12,29 +12,16 @@ def to_categorical(y, num_classes):
     return np.eye(num_classes, dtype='uint8')[y]
 
 # added by Atif
-def checkpoint(model, optimizer, filename, 
-               best_validation_accuracy, 
-               best_validation_trail,
-               best_validation_fold,
-               best_validation_epoch, 
-               training_accuracy):
-  torch.save({
-    'optimizer': optimizer.state_dict(),
-    'model': model.state_dict(),
-    'best_validation_accuracy': best_validation_accuracy, 
-    'best_validation_trail': best_validation_epoch,
-    'best_validation_fold': best_validation_epoch,
-    'best_validation_epoch': best_validation_epoch,
-    'training_accuracy_corresponding_to_best_validation_accuracy': training_accuracy
-  }, filename)
+def checkpoint(current_checkpoint, filename):
+  torch.save(current_checkpoint, filename)
 
-def resume(model, optimizer, filename):
-  checkpoint = torch.load(filename)
-  model.load_state_dict(checkpoint['model'])
-  optimizer.load_state_dict(checkpoint['optimizer'])
-  best_validation_accuracy = checkpoint['best_validation_accuracy']
-  best_validation_trail = checkpoint['best_validation_trail']
-  best_validation_fold = checkpoint['best_validation_fold']
+#def resume(model, optimizer, filename):
+#  checkpoint = torch.load(filename)
+#  model.load_state_dict(checkpoint['model'])
+#  optimizer.load_state_dict(checkpoint['optimizer'])
+#  best_validation_accuracy = checkpoint['best_validation_accuracy']
+#  best_validation_trail = checkpoint['best_validation_trail']
+#  best_validation_fold = checkpoint['best_validation_fold']
   best_validation_epoch = checkpoint['best_validation_epoch']
   return best_validation_accuracy, best_validation_trail, best_validation_fold, best_validation_epoch
 
