@@ -374,7 +374,7 @@ def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 24
                                loss_fn2=loss_fn2, lambda1=lambda1, 
                                lambda2=lambda2, epochs_per_fold = epochs_per_fold, 
                                early_stop_thresh = early_stop_thresh, 
-                               train_device=train_device, resume_from=resume, 
+                               train_device=train_device, resume_from=resume_from, 
                                best_validation_accuracy=best_validation_accuracy, 
                                trail=trail, fold=fold, epoch=epoch)
 
