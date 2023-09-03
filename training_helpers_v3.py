@@ -299,13 +299,20 @@ def reset_weights(m):
     print(f'Reset trainable parameters of layer = {layer}')
     layer.reset_parameters()
 
-def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
-                num_classes=100, num_filters=8, model_type='Encoder+Classifier', 
-                model=None, optimizer=None, 
-                loss_fn = torch.nn.CrossEntropyLoss(), 
-                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs_per_fold = 50, early_stop_thresh = 5, train_device='cuda', 
-                resume_from=None, results=[], best_validation_accuracy=0, trail=0, fold=1, epoch = 1):
+def train_folds(ear_images, sub_labels, k_folds, 
+                model_parameters = {'model_type': "Encoder+Classifier", 
+                                     'model': None, 'num_filters': 8, 
+                                     'optimizer': None, 
+                                     'loss_fn': torch.nn.CrossEntropyLoss(), 
+                                     'loss_fn2': torch.nn.MSELoss(), 
+                                     'lambda1': 0.5, 'lambda2': 0.5},
+                 max_state = {'ntrails': 0, 'kfolds': 0, 'epochs': 1},
+                 current_state = {'trail': 0, 'fold': 0, 'epoch': 1},
+                 best_state = {'training_loss': 0, 'training_accuracy': 0, 
+                               'validation_loss': 0,'validation_accuracy': 0, 
+                               'trail': 0, 'fold': 0, 'epoch': 0},
+                 early_stop_thresh = 5, train_device='cuda', 
+                 resume_from=None, results=[]):
 
     model = model_parameters['model']
     optimizer = model_parameters['optimizer']
