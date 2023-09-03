@@ -219,9 +219,9 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   # For k fold results
   if trail== 0 and fold==0:
-      results = [{{'training_loss': 0, 'training_accuracy': 0, 
-                   'validation_loss': 0,'validation_accuracy': 0, 
-                   'trail': 0, 'fold': 0, 'epoch': 0}}]*epochs
+      results = [{'training_loss': 0, 'training_accuracy': 0, 
+                  'validation_loss': 0,'validation_accuracy': 0, 
+                  'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
