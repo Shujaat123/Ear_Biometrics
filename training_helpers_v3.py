@@ -16,7 +16,12 @@ def to_categorical(y, num_classes):
 def train_one_epoch(training_loader, validation_loader,
                     num_training_samples, num_validation_samples,
                     input_shape=(351, 246, 3), num_classes=100, 
-                    model_parameters = model_parameters, 
+                    model_parameters = {'model_type': 'Encoder+Classifier', 
+                                     'model': None, 'num_filters': 8, 
+                                     'optimizer': None, 
+                                     'loss_fn' torch.nn.CrossEntropyLoss(), 
+                                     'loss_fn2': torch.nn.MSELoss(), 
+                                     'lambda1': 0.5, 'lambda2': 0.5}, 
                     train_device='cuda'):
 
     num_filters = model_parameters['num_filters']
