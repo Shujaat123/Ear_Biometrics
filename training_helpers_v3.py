@@ -23,7 +23,7 @@ def train_one_epoch(training_loader, validation_loader,
                                      'loss_fn2': torch.nn.MSELoss(), 
                                      'lambda1': 0.5, 'lambda2': 0.5}, 
                     train_device='cuda'):
-
+    print(f"Here Shijaat model: {model_parameters['model']}")
     num_filters = model_parameters['num_filters']
     model_type = model_parameters['model_type']
     model = model_parameters['model']
@@ -33,6 +33,7 @@ def train_one_epoch(training_loader, validation_loader,
     lambda1 = model_parameters['lambda1']
     lambda2 = model_parameters['lambda1']
 
+    print(f"Here Shijaat model after chnaging1: {model_parameters['model']}")
     # training metrics
     train_loss = 0
     train_correct = 0
@@ -223,6 +224,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
                   'validation_loss': 0,'validation_accuracy': 0, 
                   'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
+  
+  print(f"Here Shijaat model after chnaging4: {model_parameters['model']}")
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     training_loss, training_accuracy, validation_loss, validation_accuracy = \
@@ -231,6 +234,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
                       input_shape=input_shape, num_classes=num_classes,
                       model_parameters=model_parameters, train_device=train_device)
 
+    
+    print(f"Here Shijaat model after chnaging4: {model_parameters['model']}")
     current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
     results[current_index] = {'training_loss': training_loss/num_training_samples, 
                               'training_accuracy': training_accuracy, 
@@ -239,9 +244,9 @@ def train_epochs(X_train, y_train, X_test, y_test,
                               'trail': trail, 'fold': fold, 'epoch': epoch}
     
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {training_loss/len(training_loader)}")
-
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {validation_loss/len(validation_loader)}")
 
+    print(f"Here Shijaat model after chnaging5: {model}")
     if validation_accuracy > best_validation_accuracy: 
         best_validation_accuracy = validation_accuracy 
         best_validation_index = current_index
