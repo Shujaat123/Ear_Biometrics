@@ -219,7 +219,9 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   # For k fold results
   if trail== 0 and fold==0:
-      results = [{}]*epochs
+      results = [{{'training_loss': 0, 'training_accuracy': 0, 
+                   'validation_loss': 0,'validation_accuracy': 0, 
+                   'trail': 0, 'fold': 0, 'epoch': 0}}]*epochs
 
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
@@ -233,7 +235,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
     results[current_index] = {'training_loss': training_loss/num_training_samples, 
                               'training_accuracy': training_accuracy, 
                               'validation_loss': validation_loss/num_validation_samples, 
-                              'validation_accuracy': validation_accuracy}
+                              'validation_accuracy': validation_accuracy,
+                              'trail': trail, 'fold': fold, 'epoch': epoch}
     
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {training_loss/len(training_loader)}")
 
