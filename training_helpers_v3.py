@@ -372,26 +372,19 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
 
     # Reset model weights before each fold
     model.apply(reset_weights)
+    
     best_state = train_epochs(X_train, y_train, X_test, y_test, 
-                              input_shape=input_shape, num_classes=num_classes, 
-                                            num_filters=num_filters, 
-                                            model_type=model_type, 
-                                            model=model, optimizer=optimizer, 
-                                            loss_fn=loss_fn, loss_fn2=loss_fn2, 
-                                            lambda1=lambda1, lambda2=lambda2, 
-                                            epochs=epochs_per_fold, 
-                                            early_stop_thresh=early_stop_thresh, 
-                                            train_device=train_device, 
-                                            resume_from=resume_from, results=results, 
-                                            best_validation_accuracy=best_validation_accuracy, 
-                                            trail=trail, fold=fold+1, epoch=epoch)
-
+                              model_parameters=model_parameters,
+                              max_state=max_state, 
+                              current_state=current_state,
+                              best_state=best_state, 
+                              early_stop_thresh=early_stop_thresh,
+                              train_device=train_device, 
+                              resume_from=resume_from, results=results)
+    best_validation_accuracy = best_state['validation_accuracy']
     print(f'Fold {fold+1}: {best_validation_accuracy} %')
     sum += best_validation_accuracy
-    #if trail== 0:
-    #    results[fold] = best_validation_accuracy
-    #else:
-    #    results[trail,fold] = best_validation_accuracy
+    
   k_folds_avg_validation_accuracy = sum/k_folds
   print(f'Average: {k_folds_avg_validation_accuracy} %')
   
