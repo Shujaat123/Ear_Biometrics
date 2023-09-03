@@ -33,7 +33,6 @@ def train_one_epoch(training_loader, validation_loader,
     lambda1 = model_parameters['lambda1']
     lambda2 = model_parameters['lambda1']
 
-
     # training metrics
     train_loss = 0
     train_correct = 0
@@ -249,7 +248,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                       'validation_loss': validation_loss, 
                       'validation_accuracy': validation_accuracy, 
                       'trail': trail, 'fold': fold, 'epoch': epoch}
-        # creating the best checkpoint
+        # creating the best checkpoint and saving it in the file
         best_checkpoint = { 
             'model': model.state_dict(), 
             'optimizer': optimizer.state_dict(),
@@ -263,7 +262,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         }
         torch.save(best_checkpoint, "best_checkpoint.pth")
     
-    # creating the latest checkpoint
+    # creating the latest checkpoint and saving it in the file
     latest_checkpoint = { 
         'model': model.state_dict(), 
         'optimizer': optimizer.state_dict(),
