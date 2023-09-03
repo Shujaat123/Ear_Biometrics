@@ -179,7 +179,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                                'validation_loss': 0,'validation_accuracy': 0, 
                                'trail': 0, 'fold': 0, 'epoch': 1},
                  early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, results=np.empty([0])):
+                 resume_from=None, results=[]):
 
   kfolds = max_state['kfolds']
   epochs = max_state['epochs']
@@ -219,7 +219,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   # For k fold results
   if trail== 0 and fold==0:
-      results = [0]*epochs
+      results = [{}]*epochs
 
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
