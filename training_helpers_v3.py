@@ -24,6 +24,7 @@ def train_one_epoch(training_loader, validation_loader,
                                      'lambda1': 0.5, 'lambda2': 0.5}, 
                     train_device='cuda'):
 
+    print(f"Here Atif model {model_parameters['model']}")
     num_filters = model_parameters['num_filters']
     model_type = model_parameters['model_type']
     model = model_parameters['model']
