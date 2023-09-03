@@ -180,17 +180,20 @@ def train_epochs(X_train, y_train, X_test, y_test,
                  early_stop_thresh = 5, train_device='cuda', 
                  resume_from=None, results=[]):
 
+  model = model_parameters['model']
+  optimizer = model_parameters['optimizer']
+  
   kfolds = max_state['kfolds']
   epochs = max_state['epochs']
- 
+  
   best_validation_accuracy = best_state['validation_accuracy']
   best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
                      (best_state['fold']-1)*epochs + (best_state['epoch']-1)
-
+  
   trail = current_state['trail']
   fold = current_state['fold']
   epoch = current_state['epoch']
-
+  
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
@@ -222,9 +225,6 @@ def train_epochs(X_train, y_train, X_test, y_test,
                   'validation_loss': 0,'validation_accuracy': 0, 
                   'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
-  
-  print(f"Here Shijaat model after chnaging1: {type(model_parameters['model'])}")
-  print(f"After Atif chnaging1: {type(model)}")
   for epoch in range(epoch, epochs+1):
     print('EPOCH {}/{}:'.format(epoch,epochs))
     training_loss, training_accuracy, validation_loss, validation_accuracy = \
@@ -233,9 +233,6 @@ def train_epochs(X_train, y_train, X_test, y_test,
                       input_shape=input_shape, num_classes=num_classes,
                       model_parameters=model_parameters, train_device=train_device)
 
-    
-    print(f"Here Shijaat model after chnaging2: {type(model_parameters['model'])}")
-    print(f"After Atif chnaging2: {type(model)}")
     current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
     results[current_index] = {'training_loss': training_loss/num_training_samples, 
                               'training_accuracy': training_accuracy, 
@@ -246,8 +243,6 @@ def train_epochs(X_train, y_train, X_test, y_test,
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {training_loss/len(training_loader)}")
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {validation_loss/len(validation_loader)}")
 
-    print(f"Here Shijaat model after chnaging3: {type(model)}")
-    print(f"After Atif chnaging3: {type(model)}")
     if validation_accuracy > best_validation_accuracy: 
         best_validation_accuracy = validation_accuracy 
         best_validation_index = current_index
