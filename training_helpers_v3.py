@@ -200,7 +200,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
       trail = resume_checkpoint['trail']
       fold = resume_checkpoint['fold']
       epoch = resume_checkpoint['epoch']
-      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
+      best_state = resume_checkpoint['best_validation_accuracy']
+      best_validation_accuracy = best_state['validation_accuracy']
       # load model and optimizer 
       model.load_state_dict(checkpoint['model'])
       optimizer.load_state_dict(checkpoint['optimizer'])
@@ -261,7 +262,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
             'trail': trail, 
             'fold': fold,
             'epoch': epoch,
-            'best_validation_accuracy': best_validation_accuracy,
+            'best_state': best_state,
             'results': results,
         }
         torch.save(best_checkpoint, "best_checkpoint.pth")
@@ -275,7 +276,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         'trail': trail, 
         'fold': fold,
         'epoch': epoch,
-        'best_validation_accuracy': best_validation_accuracy,
+        'best_state': best_state,
         'results': results,
     }
     torch.save(latest_checkpoint, "latest_checkpoint.pth")
@@ -306,89 +307,78 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 epochs_per_fold = 50, early_stop_thresh = 5, train_device='cuda', 
                 resume_from=None, results=[], best_validation_accuracy=0, trail=0, fold=1, epoch = 1):
 
-  ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
-                num_classes=100, num_filters=8, model_type='Encoder+Classifier', 
-                model=None, optimizer=None, 
-                loss_fn = torch.nn.CrossEntropyLoss(), 
-                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs_per_fold = 50, early_stop_thresh = 5, train_device='cuda', 
-                resume_from=None, results=[], best_validation_accuracy=0, trail=0, fold=1, epoch = 1
-  
-  model = model_parameters['model']
-  optimizer = model_parameters['optimizer']
-  
-  k_folds = max_state['kfolds']
-  epochs_per_fold = max_state['epochs']
-  
-  #best_validation_accuracy = best_state['validation_accuracy']
-  #best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
-  #  (best_state['fold']-1)*epochs_per_fold + (best_state['epoch']-1)
-  
-  #trail = current_state['trail']
-  #fold = current_state['fold']
-  #epoch = current_state['epoch']
-  
-  #resume
-  if not resume_from == None:
-      resume_checkpoint = torch.load(resume_from)
-      trail = resume_checkpoint['trail']
-      fold = resume_checkpoint['fold']
-      epoch = resume_checkpoint['epoch']
-      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
-      # load model and optimizer 
-      model.load_state_dict(checkpoint['model'])
-      optimizer.load_state_dict(checkpoint['optimizer'])
-  
-  # Set fixed random number seed
-  kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
+    model = model_parameters['model']
+    optimizer = model_parameters['optimizer']
+    k_folds = max_state['kfolds']
+    epochs_per_fold = max_state['epochs']
 
-  # For k fold results
-  if trail== 0:
-      results = [[{'training_loss': 0, 'training_accuracy': 0, 
-                  'validation_loss': 0,'validation_accuracy': 0, 
-                  'trail': 0, 'fold': 0, 'epoch': 0}]*epochs_per_fold]*k_folds
-      # results = np.zeros(k_folds)
-
-  # Print k-fold results
-  print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
-  print('--------------------------------')
-  sum = 0.0
-  # K-fold Cross Validation model evaluation
-  for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
-
-    # Print
-    print(f'FOLD {fold+1}')
+    #best_validation_accuracy = best_state['validation_accuracy']
+    #best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
+    #  (best_state['fold']-1)*epochs_per_fold + (best_state['epoch']-1)
+    
+    #trail = current_state['trail']
+    #fold = current_state['fold']
+    #epoch = current_state['epoch']
+    
+    #resume
+    if not resume_from == None:
+        resume_checkpoint = torch.load(resume_from)
+        current_state = {'trail': resume_checkpoint['trail'],
+                         'fold': resume_checkpoint['fold'],
+                         'epoch' resume_checkpoint['epoch']}
+        best_state = resume_checkpoint['best_state']
+        # load model and optimizer 
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+    
+    # Set fixed random number seed
+    kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
+    
+    # For k fold results
+    if trail== 0:
+        results = [[{'training_loss': 0, 'training_accuracy': 0, 
+                     'validation_loss': 0,'validation_accuracy': 0, 
+                     'trail': 0, 'fold': 0, 'epoch': 0}]*epochs_per_fold]*k_folds
+        # results = np.zeros(k_folds)
+    
+    # Print k-fold results
+    print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
     print('--------------------------------')
-
-    X_train = ear_images[train_ids, :, :, :]
-    y_train = sub_labels[train_ids]
-    X_test = ear_images[test_ids, :, :, : ]
-    y_test = sub_labels[test_ids]
-
-    print('Training dataset:\n',X_train.shape)
-    print(y_train.shape)
-    print('Test dataset:\n',X_test.shape)
-    print(y_test.shape)
-
-    # Reset model weights before each fold
-    model.apply(reset_weights)
+    sum = 0.0
+    # K-fold Cross Validation model evaluation
+    for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
     
-    best_state = train_epochs(X_train, y_train, X_test, y_test, 
-                              model_parameters=model_parameters,
-                              max_state=max_state, 
-                              current_state=current_state,
-                              best_state=best_state, 
-                              early_stop_thresh=early_stop_thresh,
-                              train_device=train_device, 
-                              resume_from=resume_from, results=results)
-    best_validation_accuracy = best_state['validation_accuracy']
-    print(f'Fold {fold+1}: {best_validation_accuracy} %')
-    sum += best_validation_accuracy
+        # Print
+        print(f'FOLD {fold+1}')
+        print('--------------------------------')
+
+        X_train = ear_images[train_ids, :, :, :]
+        y_train = sub_labels[train_ids]
+        X_test = ear_images[test_ids, :, :, : ]
+        y_test = sub_labels[test_ids]
+        
+        print('Training dataset:\n',X_train.shape)
+        print(y_train.shape)
+        print('Test dataset:\n',X_test.shape)
+        print(y_test.shape)
+        
+        # Reset model weights before each fold
+        model.apply(reset_weights)
+        best_state = train_epochs(X_train, y_train, X_test, y_test, 
+                                  model_parameters=model_parameters, 
+                                  max_state=max_state, 
+                                  current_state=current_state, 
+                                  best_state=best_state, 
+                                  early_stop_thresh=early_stop_thresh, 
+                                  train_device=train_device, 
+                                  resume_from=resume_from, results=results)
+        best_validation_accuracy = best_state['validation_accuracy']
+        print(f'Fold {fold+1}: {best_validation_accuracy} %')
+        sum += best_validation_accuracy
     
-  k_folds_avg_validation_accuracy = sum/k_folds
-  print(f'Average: {k_folds_avg_validation_accuracy} %')
-  
-  return k_folds_avg_validation_accuracy, best_validation_accuracy
+    k_folds_avg_validation_accuracy = sum/k_folds
+    print(f'Average: {k_folds_avg_validation_accuracy} %')
+    return k_folds_avg_validation_accuracy, best_validation_accuracy
 
 def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
                 num_classes=100, num_filters=8, model_type='Encoder+Classifier',
