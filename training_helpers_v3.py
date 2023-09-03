@@ -430,7 +430,9 @@ def train_trails(ear_images, sub_labels,
         #best_validation_accuracy = 0
       
     # For N trail results
-    results = [0]*(epochs_per_fold*k_folds*n_trails)
+    results = [{'training_loss': 0, 'training_accuracy': 0, 
+                'validation_loss': 0,'validation_accuracy': 0, 
+                'trail': 0, 'fold': 0, 'epoch': 1}]*(epochs_per_fold*k_folds*n_trails)
     # results = np.zeros((n_trails, k_folds))
 
     # Print N trail results
