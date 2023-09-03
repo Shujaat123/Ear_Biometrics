@@ -307,7 +307,7 @@ def train_folds(ear_images, sub_labels, k_folds,
                                      'loss_fn2': torch.nn.MSELoss(), 
                                      'lambda1': 0.5, 'lambda2': 0.5},
                  max_state = {'ntrails': 0, 'kfolds': 0, 'epochs': 1},
-                 current_state = {'trail': 0, 'fold': 0, 'epoch': 1},
+                 current_state = {'trail': 0, 'fold': 1, 'epoch': 1},
                  best_state = {'training_loss': 0, 'training_accuracy': 0, 
                                'validation_loss': 0,'validation_accuracy': 0, 
                                'trail': 0, 'fold': 0, 'epoch': 0},
@@ -372,6 +372,7 @@ def train_folds(ear_images, sub_labels, k_folds,
         
         # Reset model weights before each fold
         model.apply(reset_weights)
+        current_state = {'trail': 0, 'fold': fold+1, 'epoch': 1}
         best_state = train_epochs(X_train, y_train, X_test, y_test, 
                                   model_parameters=model_parameters, 
                                   max_state=max_state, 
