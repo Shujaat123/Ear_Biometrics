@@ -353,6 +353,7 @@ def train_folds(ear_images, sub_labels, k_folds,
     print('--------------------------------')
     sum = 0.0
     # K-fold Cross Validation model evaluation
+    print(f'Current State: {current_state}')
     for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
     
         # Print
