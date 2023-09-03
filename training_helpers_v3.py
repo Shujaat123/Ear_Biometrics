@@ -306,7 +306,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
 
   # For k fold results
   if trail== 0:
-      results = [[0]*epochs_per_fold]*k_folds
+      results = [[{'train_loss': 0, 'training_accuracy': 0, 'valid_loss': 0, 'validation_accuracy': 0}]*epochs_per_fold]*k_folds
       # results = np.zeros(k_folds)
 
   # Print k-fold results
