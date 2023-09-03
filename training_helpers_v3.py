@@ -325,7 +325,7 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
         resume_checkpoint = torch.load(resume_from)
         current_state = {'trail': resume_checkpoint['trail'],
                          'fold': resume_checkpoint['fold'],
-                         'epoch' resume_checkpoint['epoch']}
+                         'epoch': resume_checkpoint['epoch']}
         best_state = resume_checkpoint['best_state']
         # load model and optimizer 
         model.load_state_dict(checkpoint['model'])
