@@ -268,7 +268,7 @@ def train_epochs(X_train, y_train, X_test, y_test, input_shape=(351, 246, 3),
         break  # terminate the training loop
     thresh_epoch+=1
 
-  print(f'Results: {results}')
+  print(f'Results of Trail {trail} and Fold {fold}: {results}')
   return best_validation_accuracy
 
 def reset_weights(m):
