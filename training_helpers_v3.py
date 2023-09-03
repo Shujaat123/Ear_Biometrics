@@ -323,7 +323,7 @@ def train_folds(ear_images, sub_labels, k_folds,
     #best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
     #  (best_state['fold']-1)*epochs_per_fold + (best_state['epoch']-1)
     
-    #trail = current_state['trail']
+    trail = current_state['trail']
     #fold = current_state['fold']
     #epoch = current_state['epoch']
     
