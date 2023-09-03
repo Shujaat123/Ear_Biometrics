@@ -299,7 +299,7 @@ def reset_weights(m):
     print(f'Reset trainable parameters of layer = {layer}')
     layer.reset_parameters()
 
-def train_folds(ear_images, sub_labels, k_folds, 
+def train_folds(ear_images, sub_labels, 
                 model_parameters = {'model_type': "Encoder+Classifier", 
                                      'model': None, 'num_filters': 8, 
                                      'optimizer': None, 
@@ -387,57 +387,71 @@ def train_folds(ear_images, sub_labels, k_folds,
     
     k_folds_avg_validation_accuracy = sum/k_folds
     print(f'Average: {k_folds_avg_validation_accuracy} %')
-    return k_folds_avg_validation_accuracy, best_validation_accuracy
+    return k_folds_avg_validation_accuracy, best_state
 
-def train_trails(n_trails, ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
-                num_classes=100, num_filters=8, model_type='Encoder+Classifier',
-                model=None, optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(),
-                loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5,
-                epochs_per_fold = 50, early_stop_thresh = 5,
-                resume_from=None, train_device='cuda'):
+def train_trails(ear_images, sub_labels,
+                 model_parameters = {'model_type': "Encoder+Classifier", 
+                                     'model': None, 'num_filters': 8, 
+                                     'optimizer': None, 
+                                     'loss_fn': torch.nn.CrossEntropyLoss(), 
+                                     'loss_fn2': torch.nn.MSELoss(), 
+                                     'lambda1': 0.5, 'lambda2': 0.5},
+                 max_state = {'ntrails': 0, 'kfolds': 0, 'epochs': 1},
+                 current_state = {'trail': 0, 'fold': 1, 'epoch': 1},
+                 best_state = {'training_loss': 0, 'training_accuracy': 0, 
+                               'validation_loss': 0,'validation_accuracy': 0, 
+                               'trail': 0, 'fold': 0, 'epoch': 0},
+                 early_stop_thresh = 5, train_device='cuda', 
+                 resume_from=None):
 
-  trail = 1
-  #resume
-  if not resume_from == None:
-      resume_checkpoint = torch.load(resume_from)
-      trail = resume_checkpoint['trail']
-      fold = resume_checkpoint['fold']
-      epoch = resume_checkpoint['epoch']
-      best_validation_accuracy = resume_checkpoint['best_validation_accuracy']
-      # load model and optimizer 
-      model.load_state_dict(checkpoint['model'])
-      optimizer.load_state_dict(checkpoint['optimizer'])
-  else:
-      trail = 1
-      fold = 1
-      epoch = 1
-      best_validation_accuracy = 0
+    model = model_parameters['model']
+    optimizer = model_parameters['optimizer']
+                     
+    n_trails = max_state['ntrails']
+    k_folds = max_state['kfolds']
+    epochs_per_fold = max_state['epochs']
+    
+    #resume
+    if not resume_from == None:
+        resume_checkpoint = torch.load(resume_from)
+        trail = resume_checkpoint['trail']
+        fold = resume_checkpoint['fold']
+        epoch = resume_checkpoint['epoch']
+        current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
+        best_state = resume_checkpoint['best_state']
+        #best_validation_accuracy = best_state['validation_accuracy'] 
+        # load model and optimizer 
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+    else:
+        trail = 1
+        #fold = 1
+        #epoch = 1
+        #best_validation_accuracy = 0
       
-  # For N trail results
-  results = [[[0]*epochs_per_fold]*k_folds]*n_trails
-  # results = np.zeros((n_trails, k_folds))
+    # For N trail results
+    results = [0]*(epochs_per_fold*k_folds*n_trails)
+    # results = np.zeros((n_trails, k_folds))
 
-  # Print N trail results
-  print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
-  print('--------------------------------')
-  sum = 0.0
-  # N-trail Cross Validation model evaluation
-  for trail in range(trail, n_trails+1):
-    print(f"Trail: {trail}")
-    X, y = shuffle(ear_images, sub_labels, random_state=42)
-    k_folds_avg_validation_accuracy, best_validation_accuracy = train_folds(X, y, k_folds, input_shape=input_shape, 
-                               num_classes=num_classes, num_filters=num_filters, 
-                               model_type=model_type, model=model, 
-                               optimizer=optimizer, loss_fn=loss_fn, 
-                               loss_fn2=loss_fn2, lambda1=lambda1, 
-                               lambda2=lambda2, epochs_per_fold = epochs_per_fold, 
-                               early_stop_thresh = early_stop_thresh, 
-                               train_device=train_device, resume_from=resume_from, 
-                               results=results, 
-                               best_validation_accuracy=best_validation_accuracy, 
-                               trail=trail, fold=fold, epoch=epoch)
-
-    print(f'Trail {trail}: {k_folds_avg_validation_accuracy} %')
-    sum += k_folds_avg_validation_accuracy
-
-  print(f'Average: {sum/n_trails} %')
+    # Print N trail results
+    print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
+    print('--------------------------------')
+    sum = 0.0
+    # N-trail Cross Validation model evaluation
+    for trail in range(trail, n_trails+1):
+        print(f"Trail: {trail}")
+        X, y = shuffle(ear_images, sub_labels, random_state=42)
+        current_state = {'trail': trail, 'fold': 1, 'epoch': 1}
+        k_folds_avg_validation_accuracy, best_state = train_folds(X, y, 
+                                                                  model_parameters=model_parameters, 
+                                                                  max_state=max_state, 
+                                                                  current_state=current_state, 
+                                                                  best_state=best_state, 
+                                                                  early_stop_thresh=early_stop_thresh, 
+                                                                  train_device=train_device, 
+                                                                  resume_from=resume_from, results=results)
+        
+        print(f'Trail {trail}: {k_folds_avg_validation_accuracy} %')
+        sum += k_folds_avg_validation_accuracy
+    
+    print(f'Average: {sum/n_trails} %')
