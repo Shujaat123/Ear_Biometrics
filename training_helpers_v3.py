@@ -318,16 +318,15 @@ def train_folds(ear_images, sub_labels, k_folds, input_shape=(351, 246, 3),
   optimizer = model_parameters['optimizer']
   
   k_folds = max_state['kfolds']
-  epochs = max_state['epochs']
+  epochs_per_fold = max_state['epochs']
   
   best_validation_accuracy = best_state['validation_accuracy']
-  best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
-                     (best_state['fold']-1)*epochs + (best_state['epoch']-1)
+  best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
+    (best_state['fold']-1)*epochs_per_fold + (best_state['epoch']-1)
   
   trail = current_state['trail']
   fold = current_state['fold']
   epoch = current_state['epoch']
-
   
   #resume
   if not resume_from == None:
