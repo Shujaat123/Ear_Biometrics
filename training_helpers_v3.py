@@ -176,7 +176,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                  current_state = {'trail': 0, 'fold': 0, 'epoch': 1},
                  best_state = {'training_loss': 0, 'training_accuracy': 0, 
                                'validation_loss': 0,'validation_accuracy': 0, 
-                               'trail': 0, 'fold': 0, 'epoch': 1},
+                               'trail': 0, 'fold': 0, 'epoch': 0},
                  early_stop_thresh = 5, train_device='cuda', 
                  resume_from=None, results=[]):
 
