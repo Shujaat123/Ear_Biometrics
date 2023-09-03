@@ -285,7 +285,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         print(f"The best vaidation accuarcy was {best_state['validation_accuracy']} at state (trail, fold, epoch) = ({best_state['trail']}, {best_state['fold']}, {best_state['epoch']})")
         break  # terminate the training loop
 
-  print(f'Results of Trail {trail}, Fold {fold} and Fold {epoch}: {results}')
+  print(f'Results of Trail {trail}, Fold {fold} and Epoch {epoch}: {results}')
   return best_state
 
 def reset_weights(m):
