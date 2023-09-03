@@ -15,11 +15,19 @@ def to_categorical(y, num_classes):
 # manaul training
 def train_one_epoch(training_loader, validation_loader,
                     num_training_samples, num_validation_samples,
-                    input_shape=(351, 246, 3), num_classes=100, num_filters=8,
-                    model_type='Encoder+Classifier', model=None,
-                    optimizer=None, loss_fn = torch.nn.CrossEntropyLoss(), 
-                    loss_fn2 = torch.nn.MSELoss(), lambda1=0.5, lambda2=0.5, 
+                    input_shape=(351, 246, 3), num_classes=100, 
+                    model_parameters = model_parameters, 
                     train_device='cuda'):
+
+    num_filters = model_parameters['num_filters']
+    model_type = model_parameters['Encoder+Classifier']
+    model = model_parameters['model']
+    optimizer = model_parameters['optimizer']
+    loss_fn = model_parameters['loss_fn'] 
+    loss_fn2 = model_parameters['loss_fn2']
+    lambda1 = model_parameters['lambda1']
+    lambda2 = model_parameters['lambda1']
+
 
     # training metrics
     train_loss = 0
