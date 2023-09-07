@@ -282,9 +282,10 @@ def train_epochs(X_train, y_train, X_test, y_test,
         'results': results,
     }
     torch.save(latest_checkpoint, "latest_checkpoint.pth")
+    
     # saving checkpoint after every "checkpoint_save_step" (default = 5)
     if checkpoint_save_step > 0 and epoch%checkpoint_save_step==0:
-        torch.save(latest_checkpoint, "latest_checkpoint" + str(trail) + "_" + str(fold) + str(epoch) + "_" + ".pth")
+        torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
       
     if current_index - best_validation_index >= early_stop_thresh:
         print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
@@ -305,19 +306,19 @@ def reset_weights(m):
     layer.reset_parameters()
 
 def train_folds(ear_images, sub_labels, 
-                model_parameters = {'model_type': "Encoder+Classifier", 
-                                     'model': None, 'num_filters': 8, 
-                                     'optimizer': None, 
-                                     'loss_fn': torch.nn.CrossEntropyLoss(), 
-                                     'loss_fn2': torch.nn.MSELoss(), 
-                                     'lambda1': 0.5, 'lambda2': 0.5},
-                 max_state = {'ntrails': 0, 'kfolds': 0, 'epochs': 1},
-                 current_state = {'trail': 0, 'fold': 1, 'epoch': 1},
-                 best_state = {'training_loss': 0, 'training_accuracy': 0, 
-                               'validation_loss': 0,'validation_accuracy': 0, 
-                               'trail': 0, 'fold': 0, 'epoch': 0},
-                 early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None, results=[]):
+                model_parameters={'model_type': "Encoder+Classifier", 
+                                  'model': None, 'num_filters': 8, 
+                                  'optimizer': None, 
+                                  'loss_fn': torch.nn.CrossEntropyLoss(), 
+                                  'loss_fn2': torch.nn.MSELoss(), 
+                                  'lambda1': 0.5, 'lambda2': 0.5},
+                max_state={'ntrails': 0, 'kfolds': 0, 'epochs': 1},
+                current_state={'trail': 0, 'fold': 1, 'epoch': 1},
+                best_state={'training_loss': 0, 'training_accuracy': 0, 
+                            'validation_loss': 0,'validation_accuracy': 0, 
+                            'trail': 0, 'fold': 0, 'epoch': 0},
+                early_stop_thresh=5, train_device='cuda', 
+                checkpoint_save_step=5, resume_from=None, results=[]):
 
     model = model_parameters['model']
     optimizer = model_parameters['optimizer']
@@ -395,19 +396,19 @@ def train_folds(ear_images, sub_labels,
     return k_folds_avg_validation_accuracy, best_state
 
 def train_trails(ear_images, sub_labels,
-                 model_parameters = {'model_type': "Encoder+Classifier", 
+                 model_parameters={'model_type': "Encoder+Classifier", 
                                      'model': None, 'num_filters': 8, 
                                      'optimizer': None, 
                                      'loss_fn': torch.nn.CrossEntropyLoss(), 
                                      'loss_fn2': torch.nn.MSELoss(), 
                                      'lambda1': 0.5, 'lambda2': 0.5},
-                 max_state = {'ntrails': 0, 'kfolds': 0, 'epochs': 1},
-                 current_state = {'trail': 1, 'fold': 1, 'epoch': 1},
-                 best_state = {'training_loss': 0, 'training_accuracy': 0, 
+                 max_state={'ntrails': 0, 'kfolds': 0, 'epochs': 1},
+                 current_state={'trail': 1, 'fold': 1, 'epoch': 1},
+                 best_state={'training_loss': 0, 'training_accuracy': 0, 
                                'validation_loss': 0,'validation_accuracy': 0, 
                                'trail': 0, 'fold': 0, 'epoch': 0},
-                 early_stop_thresh = 5, train_device='cuda', 
-                 resume_from=None):
+                 early_stop_thresh=5, train_device='cuda', 
+                 checkpoint_save_step=5, resume_from=None):
 
     model = model_parameters['model']
     optimizer = model_parameters['optimizer']
