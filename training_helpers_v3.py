@@ -227,6 +227,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                   'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
   for epoch in range(epoch, epochs+1):
+    current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
     print('EPOCH {}/{}:'.format(epoch,epochs))
     training_loss, training_accuracy, validation_loss, validation_accuracy = \
       train_one_epoch(training_loader, validation_loader,
@@ -258,10 +259,10 @@ def train_epochs(X_train, y_train, X_test, y_test,
             'model': model.state_dict(), 
             'optimizer': optimizer.state_dict(),
             'training_accuracy': training_accuracy,
-            'validation_accuracy': validation_accuracy, 
-            'trail': trail, 
-            'fold': fold,
-            'epoch': epoch,
+            'training_loss': training_loss,
+            'validation_accuracy': validation_accuracy,
+            'validation_loss': validation_loss,
+            'current_state': current_state,
             'best_state': best_state,
             'results': results,
         }
@@ -272,10 +273,10 @@ def train_epochs(X_train, y_train, X_test, y_test,
         'model': model.state_dict(), 
         'optimizer': optimizer.state_dict(),
         'training_accuracy': training_accuracy,
-        'validation_accuracy': validation_accuracy, 
-        'trail': trail, 
-        'fold': fold,
-        'epoch': epoch,
+        'training_loss': training_loss,
+        'validation_accuracy': validation_accuracy,
+        'validation_loss': validation_loss,
+        'current_state': current_state,
         'best_state': best_state,
         'results': results,
     }
