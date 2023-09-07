@@ -293,7 +293,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         break  # terminate the training loop
 
   print(f'Results of Trail {trail}, Fold {fold} and Epoch {epoch}: {results}')
-  return best_state
+  return results, best_state
 
 def reset_weights(m):
   '''
@@ -379,7 +379,7 @@ def train_folds(ear_images, sub_labels,
         # Reset model weights before each fold
         model.apply(reset_weights)
         current_state = {'trail': trail, 'fold': fold+1, 'epoch': 1}
-        best_state = train_epochs(X_train, y_train, X_test, y_test, 
+        results, best_state = train_epochs(X_train, y_train, X_test, y_test, 
                                   model_parameters=model_parameters, 
                                   max_state=max_state, 
                                   current_state=current_state, 
@@ -387,9 +387,10 @@ def train_folds(ear_images, sub_labels,
                                   early_stop_thresh=early_stop_thresh, 
                                   train_device=train_device, 
                                   resume_from=resume_from, results=results)
-        best_validation_accuracy = best_state['validation_accuracy']
-        print(f'Fold {fold+1}: {best_validation_accuracy} %')
-        sum += best_validation_accuracy
+        #best_validation_accuracy = best_state['validation_accuracy']
+        fold_best_validation_accuracy = max(results[(trail-1)*kfolds*epochs + fold*epochs:(trail-1)*kfolds*epochs + (fold+1)*epochs])
+        print(f'Fold {fold+1}: {fold_best_validation_accuracy} %')
+        sum += fold_best_validation_accuracy
     
     k_folds_avg_validation_accuracy = sum/k_folds
     print(f'Average: {k_folds_avg_validation_accuracy} %')
