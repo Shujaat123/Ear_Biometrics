@@ -388,8 +388,8 @@ def train_folds(ear_images, sub_labels,
                                   train_device=train_device, 
                                   resume_from=resume_from, results=results)
         #best_validation_accuracy = best_state['validation_accuracy']
-        print(f"\n Start Index: {st_ind}\n Trail: {trail} \n Fold: {fold} \n K Folds: {k_folds} \n Epochs per Fold: {epochs_per_fold}")
         st_ind = (trail-1)*k_folds*epochs_per_fold + fold*epochs_per_fold
+        print(f"\n Start Index: {st_ind}\n Trail: {trail} \n Fold: {fold} \n K Folds: {k_folds} \n Epochs per Fold: {epochs_per_fold}")
         fold_best_validation_accuracy = max(results[st_ind:st_ind + epochs_per_fold - 1]['validation_accuracy'])
         print(f'Fold {fold+1}: {fold_best_validation_accuracy} %')
         sum += fold_best_validation_accuracy
