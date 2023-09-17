@@ -269,6 +269,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
             'validation_loss': validation_loss,
             'current_state': current_state,
             'best_state': best_state,
+            'max_state': max_state,
             'results': results,
         }
         torch.save(best_checkpoint, "best_checkpoint.pth")
@@ -283,6 +284,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         'validation_loss': validation_loss,
         'current_state': current_state,
         'best_state': best_state,
+        'max_state': max_state,
         'results': results,
     }
     torch.save(latest_checkpoint, "latest_checkpoint.pth")
@@ -326,8 +328,6 @@ def train_folds(ear_images, sub_labels,
 
     model = model_parameters['model']
     optimizer = model_parameters['optimizer']
-    k_folds = max_state['kfolds']
-    epochs_per_fold = max_state['epochs']
 
     #best_validation_accuracy = best_state['validation_accuracy']
     #best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
@@ -340,14 +340,17 @@ def train_folds(ear_images, sub_labels,
                          'fold': resume_checkpoint['fold'],
                          'epoch': resume_checkpoint['epoch']}
         best_state = resume_checkpoint['best_state']
+        max_state = resume_checkpoint['max_state']
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
     
     trail = current_state['trail']
-    fold = current_state['fold']
-    epoch = current_state['epoch']
+    #fold = current_state['fold']
+    #epoch = current_state['epoch']
+    k_folds = max_state['kfolds']
+    epochs_per_fold = max_state['epochs']
     
     # Set fixed random number seed
     kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
@@ -425,16 +428,13 @@ def train_trails(ear_images, sub_labels,
 
     model = model_parameters['model']
     optimizer = model_parameters['optimizer']
-                     
-    n_trails = max_state['ntrails']
-    k_folds = max_state['kfolds']
-    epochs_per_fold = max_state['epochs']
     
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
         current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
         best_state = resume_checkpoint['best_state']
+        max_state = resume_checkpoint['max_state']
         #best_validation_accuracy = best_state['validation_accuracy'] 
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
@@ -444,6 +444,10 @@ def train_trails(ear_images, sub_labels,
     #fold = 1
     #epoch = 1
     #best_validation_accuracy = 0
+    
+    n_trails = max_state['ntrails']
+    k_folds = max_state['kfolds']
+    epochs_per_fold = max_state['epochs']
       
     # For N trail results
     results = [{'training_loss': 0, 'training_accuracy': 0, 
