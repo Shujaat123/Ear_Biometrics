@@ -441,6 +441,7 @@ def train_trails(ear_images, sub_labels,
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
     trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
+    print(f'---Atif---trail:{trail}')                
     #fold = 1
     #epoch = 1
     #best_validation_accuracy = 0
@@ -473,7 +474,7 @@ def train_trails(ear_images, sub_labels,
                                                                   early_stop_thresh=early_stop_thresh, 
                                                                   train_device=train_device, 
                                                                   checkpoint_save_step=checkpoint_save_step, 
-                                                                  resume_from=resume_from, results=results)
+                                                                  resume_from=None, results=results)
         
         print(f'Trail {trail}: {k_folds_avg_validation_accuracy} %')
         sum += k_folds_avg_validation_accuracy
