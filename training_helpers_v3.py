@@ -220,7 +220,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
-  print(f'num_training_samples: {num_training_samples}\n num_validation_samples: {num_validation_samples}\n num_training_samples = {len(training_loader)}\n num_validation_samples = {len(validation_loader)}')
+  #print(f'num_training_samples: {num_training_samples}\n num_validation_samples: {num_validation_samples}\n num_training_samples = {len(training_loader)}\n num_validation_samples = {len(validation_loader)}')
 
   # For k fold results
   if trail== 0 and fold==0:
@@ -238,7 +238,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
                       model_parameters=model_parameters, train_device=train_device)
 
     current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
-    results[current_index] = {'training_loss': training_loss/num_training_samples, 
+      # where train batch size is 100, 
+    results[current_index] = {'training_loss': training_loss/(num_training_samples/100), 
                               'training_accuracy': training_accuracy, 
                               'validation_loss': validation_loss/num_validation_samples, 
                               'validation_accuracy': validation_accuracy,
