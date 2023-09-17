@@ -382,13 +382,14 @@ def train_folds(ear_images, sub_labels,
         model.apply(reset_weights)
         current_state = {'trail': trail, 'fold': fold+1, 'epoch': 1}
         results, best_state = train_epochs(X_train, y_train, X_test, y_test, 
-                                  model_parameters=model_parameters, 
-                                  max_state=max_state, 
-                                  current_state=current_state, 
-                                  best_state=best_state, 
-                                  early_stop_thresh=early_stop_thresh, 
-                                  train_device=train_device, 
-                                  resume_from=resume_from, results=results)
+                                           model_parameters=model_parameters, 
+                                           max_state=max_state, 
+                                           current_state=current_state, 
+                                           best_state=best_state, 
+                                           early_stop_thresh=early_stop_thresh, 
+                                           train_device=train_device,
+                                           checkpoint_save_step = checkpoint_save_step, 
+                                           resume_from=resume_from, results=results)
         #best_validation_accuracy = best_state['validation_accuracy']
         st_ind = (trail-1)*k_folds*epochs_per_fold + fold*epochs_per_fold
         print(f"\n Start Index: {st_ind}\n Trail: {trail} \n Fold: {fold} \n K Folds: {k_folds} \n Epochs per Fold: {epochs_per_fold}")
@@ -465,6 +466,7 @@ def train_trails(ear_images, sub_labels,
                                                                   best_state=best_state, 
                                                                   early_stop_thresh=early_stop_thresh, 
                                                                   train_device=train_device, 
+                                                                  checkpoint_save_step=checkpoint_save_step, 
                                                                   resume_from=resume_from, results=results)
         
         print(f'Trail {trail}: {k_folds_avg_validation_accuracy} %')
