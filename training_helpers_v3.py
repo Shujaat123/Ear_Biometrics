@@ -222,12 +222,14 @@ def train_epochs(X_train, y_train, X_test, y_test,
   num_validation_samples = len(validation_loader.dataset)
   #print(f'num_training_samples: {num_training_samples}\n num_validation_samples: {num_validation_samples}\n num_training_samples = {len(training_loader)}\n num_validation_samples = {len(validation_loader)}')
 
-  # For k fold results
+  # For Epochs results
   if trail== 0 and fold==0:
       results = [{'training_loss': 0, 'training_accuracy': 0, 
                   'validation_loss': 0,'validation_accuracy': 0, 
                   'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
+  
+  print(f'\n checkpoint_save_step = {checkpoint_save_step}')
   for epoch in range(epoch, epochs+1):
     current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
     print('EPOCH {}/{}:'.format(epoch,epochs))
@@ -359,6 +361,7 @@ def train_folds(ear_images, sub_labels,
     # Print k-fold results
     print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
     print('--------------------------------')
+    print(f'checkpoint_save_step = {checkpoint_save_step}')
     sum = 0.0
     # K-fold Cross Validation model evaluation
     print(f'Current State: {current_state}')
@@ -453,6 +456,7 @@ def train_trails(ear_images, sub_labels,
     # Print N trail results
     print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
     print('--------------------------------')
+    print(f'checkpoint_save_step = {checkpoint_save_step}')
     sum = 0.0
     # N-trail Cross Validation model evaluation
     for trail in range(trail, n_trails+1):
