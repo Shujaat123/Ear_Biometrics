@@ -184,10 +184,6 @@ def train_epochs(X_train, y_train, X_test, y_test,
   model = model_parameters['model']
   optimizer = model_parameters['optimizer']
   
-  best_validation_accuracy = best_state['validation_accuracy']
-  best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
-                     (best_state['fold']-1)*epochs + (best_state['epoch']-1)
-  
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
@@ -204,6 +200,10 @@ def train_epochs(X_train, y_train, X_test, y_test,
   trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
   fold = current_state['fold'] if resume_from == None else current_state['fold'] + 1
   epoch = current_state['epoch'] if resume_from == None else current_state['epoch'] + 1
+  
+  best_validation_accuracy = best_state['validation_accuracy']
+  best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
+                     (best_state['fold']-1)*epochs + (best_state['epoch']-1)
   
   kfolds = max_state['kfolds']
   epochs = max_state['epochs']
