@@ -204,8 +204,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
       best_state = resume_checkpoint['best_validation_accuracy']
       best_validation_accuracy = best_state['validation_accuracy']
       # load model and optimizer 
-      model.load_state_dict(checkpoint['model'])
-      optimizer.load_state_dict(checkpoint['optimizer'])
+      model.load_state_dict(resume_checkpoint['model'])
+      optimizer.load_state_dict(resume_checkpoint['optimizer'])
   
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
@@ -341,8 +341,8 @@ def train_folds(ear_images, sub_labels,
                          'epoch': resume_checkpoint['epoch']}
         best_state = resume_checkpoint['best_state']
         # load model and optimizer 
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
+        model.load_state_dict(resume_checkpoint['model'])
+        optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
     # Set fixed random number seed
     kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
@@ -433,8 +433,8 @@ def train_trails(ear_images, sub_labels,
         best_state = resume_checkpoint['best_state']
         #best_validation_accuracy = best_state['validation_accuracy'] 
         # load model and optimizer 
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
+        model.load_state_dict(resume_checkpoint['model'])
+        optimizer.load_state_dict(resume_checkpoint['optimizer'])
     else:
         trail = 1
         #fold = 1
