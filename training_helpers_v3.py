@@ -333,10 +333,6 @@ def train_folds(ear_images, sub_labels,
     #best_validation_index = (best_state['trail']-1)*k_folds*epochs_per_fold + \
     #  (best_state['fold']-1)*epochs_per_fold + (best_state['epoch']-1)
     
-    trail = current_state['trail']
-    #fold = current_state['fold']
-    #epoch = current_state['epoch']
-    
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
@@ -347,6 +343,11 @@ def train_folds(ear_images, sub_labels,
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
+    
+    
+    trail = current_state['trail']
+    fold = current_state['fold']
+    epoch = current_state['epoch']
     
     # Set fixed random number seed
     kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
@@ -432,20 +433,17 @@ def train_trails(ear_images, sub_labels,
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
-        trail = resume_checkpoint['trail']
-        fold = resume_checkpoint['fold']
-        epoch = resume_checkpoint['epoch']
         current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
         best_state = resume_checkpoint['best_state']
         #best_validation_accuracy = best_state['validation_accuracy'] 
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
-    else:
-        trail = 1
-        #fold = 1
-        #epoch = 1
-        #best_validation_accuracy = 0
+    
+    trail = current_state['trail']
+    #fold = 1
+    #epoch = 1
+    #best_validation_accuracy = 0
       
     # For N trail results
     results = [{'training_loss': 0, 'training_accuracy': 0, 
