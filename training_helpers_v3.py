@@ -184,16 +184,9 @@ def train_epochs(X_train, y_train, X_test, y_test,
   model = model_parameters['model']
   optimizer = model_parameters['optimizer']
   
-  kfolds = max_state['kfolds']
-  epochs = max_state['epochs']
-  
   best_validation_accuracy = best_state['validation_accuracy']
   best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
                      (best_state['fold']-1)*epochs + (best_state['epoch']-1)
-  
-  trail = current_state['trail']
-  fold = current_state['fold']
-  epoch = current_state['epoch']
   
   #resume
   if not resume_from == None:
@@ -203,10 +196,18 @@ def train_epochs(X_train, y_train, X_test, y_test,
       epoch = resume_checkpoint['epoch']
       best_state = resume_checkpoint['best_validation_accuracy']
       best_validation_accuracy = best_state['validation_accuracy']
+      results = resume_checkpoint['results']
       # load model and optimizer 
       model.load_state_dict(resume_checkpoint['model'])
       optimizer.load_state_dict(resume_checkpoint['optimizer'])
+
+  trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
+  fold = current_state['fold'] if resume_from == None else current_state['fold'] + 1
+  epoch = current_state['epoch'] if resume_from == None else current_state['epoch'] + 1
   
+  kfolds = max_state['kfolds']
+  epochs = max_state['epochs']
+                     
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
@@ -341,12 +342,13 @@ def train_folds(ear_images, sub_labels,
                          'epoch': resume_checkpoint['epoch']}
         best_state = resume_checkpoint['best_state']
         max_state = resume_checkpoint['max_state']
+        results = resume_checkpoint['results']
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
     
-    trail = current_state['trail']
+    trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
     #fold = current_state['fold']
     #epoch = current_state['epoch']
     k_folds = max_state['kfolds']
@@ -435,12 +437,13 @@ def train_trails(ear_images, sub_labels,
         current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
         best_state = resume_checkpoint['best_state']
         max_state = resume_checkpoint['max_state']
+        results = resume_checkpoint['results']
         #best_validation_accuracy = best_state['validation_accuracy'] 
         # load model and optimizer 
         model.load_state_dict(resume_checkpoint['model'])
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
-    trail = current_state['trail']
+    trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
     #fold = 1
     #epoch = 1
     #best_validation_accuracy = 0
