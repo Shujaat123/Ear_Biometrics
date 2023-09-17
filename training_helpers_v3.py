@@ -435,7 +435,9 @@ def train_trails(ear_images, sub_labels,
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
-        current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
+        current_state = {'trail': resume_checkpoint['trail'],
+                         'fold': resume_checkpoint['fold'],
+                         'epoch': resume_checkpoint['epoch']}
         best_state = resume_checkpoint['best_state']
         max_state = resume_checkpoint['max_state']
         results = resume_checkpoint['results']
