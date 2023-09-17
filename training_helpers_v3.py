@@ -220,6 +220,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   num_training_samples = len(training_loader.dataset)
   num_validation_samples = len(validation_loader.dataset)
+  print(f'num_training_samples: {num_training_samples}\n num_validation_samples: {num_validation_samples}\n num_training_samples = {len(training_loader)}\n num_validation_samples = {len(validation_loader)}')
 
   # For k fold results
   if trail== 0 and fold==0:
