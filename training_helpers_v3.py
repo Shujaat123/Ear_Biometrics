@@ -187,9 +187,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
   #resume
   if not resume_from == None:
       resume_checkpoint = torch.load(resume_from)
-      trail = resume_checkpoint['trail']
-      fold = resume_checkpoint['fold']
-      epoch = resume_checkpoint['epoch']
+      current_state = resume_checkpoint['current_state']
       best_state = resume_checkpoint['best_validation_accuracy']
       best_validation_accuracy = best_state['validation_accuracy']
       results = resume_checkpoint['results']
@@ -338,9 +336,7 @@ def train_folds(ear_images, sub_labels,
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
-        current_state = {'trail': resume_checkpoint['trail'],
-                         'fold': resume_checkpoint['fold'],
-                         'epoch': resume_checkpoint['epoch']}
+        current_state = resume_checkpoint['current_state']
         best_state = resume_checkpoint['best_state']
         max_state = resume_checkpoint['max_state']
         results = resume_checkpoint['results']
@@ -435,9 +431,7 @@ def train_trails(ear_images, sub_labels,
     #resume
     if not resume_from == None:
         resume_checkpoint = torch.load(resume_from)
-        current_state = {'trail': resume_checkpoint['trail'],
-                         'fold': resume_checkpoint['fold'],
-                         'epoch': resume_checkpoint['epoch']}
+        current_state = current_state['current_state']
         best_state = resume_checkpoint['best_state']
         max_state = resume_checkpoint['max_state']
         results = resume_checkpoint['results']
