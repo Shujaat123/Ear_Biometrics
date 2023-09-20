@@ -206,7 +206,11 @@ def train_epochs(X_train, y_train, X_test, y_test,
   best_validation_accuracy = best_state['validation_accuracy']
   best_validation_index = (best_state['trail']-1)*kfolds*epochs + \
                      (best_state['fold']-1)*epochs + (best_state['epoch']-1)
-                     
+
+  
+  fold_best_validation_accuracy = 0
+  fold_best_validation_accuracy_age = early_stop_thresh
+
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
   validation_loader = DataLoader(TensorDataset(torch.tensor(X_test), torch.tensor(y_test)), batch_size=1)
@@ -290,14 +294,46 @@ def train_epochs(X_train, y_train, X_test, y_test,
     torch.save(latest_checkpoint, "latest_checkpoint.pth")
     
     # saving checkpoint after every "checkpoint_save_step" (default = 5)
-    if checkpoint_save_step > 0 and epoch%checkpoint_save_step==0:
+    if checkpoint_save_step > 0 and (epoch%checkpoint_save_step==0 or epoch == epochs):
         torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
       
-    if current_index - best_validation_index >= early_stop_thresh:
+    if validation_accuracy > fold_best_validation_accuracy:
+        fold_best_validation_accuracy = validation_accuracy
+        fold_best_validation_accuracy_age = fold_best_validation_accuracy_age+1
+        
+    if fold_best_validation_accuracy_age >= early_stop_thresh:
         print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
-        print(f"The best vaidation accuarcy was {best_state['validation_accuracy']} at state (trail, fold, epoch) = ({best_state['trail']}, {best_state['fold']}, {best_state['epoch']})")
-        break  # terminate the training loop
+        print(f"The best vaidation accuarcy was {fold_best_validation_accuracy} at state (trail, fold, epoch) = ({trail}, {fold}, {epoch-early_stop_thresh})")
+        for epoch in range(epoch+1, epochs+1):
+            current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
+            # where train batch size is 100, 
+            results[current_index] = {'training_loss': training_loss/(num_training_samples/100), 
+                                      'training_accuracy': training_accuracy, 
+                                      'validation_loss': validation_loss/num_validation_samples, 
+                                      'validation_accuracy': validation_accuracy,
+                                      'trail': trail, 'fold': fold, 'epoch': epoch}
+        # creating the latest checkpoint and saving it in the file
+        latest_checkpoint = { 
+                            'model': model.state_dict(), 
+                            'optimizer': optimizer.state_dict(),
+                            'training_accuracy': training_accuracy,
+                            'training_loss': training_loss,
+                            'validation_accuracy': validation_accuracy,
+                            'validation_loss': validation_loss,
+                            'current_state': current_state,
+                            'best_state': best_state,
+                            'max_state': max_state,
+                            'results': results,
+                            }
+          torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
+          break  # terminate the training loop
+    
+    #if current_index - best_validation_index >= early_stop_thresh:
+    #    print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
+    #    print(f"The best vaidation accuarcy was {best_state['validation_accuracy']} at state (trail, fold, epoch) = ({best_state['trail']}, {best_state['fold']}, {best_state['epoch']})")
+    #    break  # terminate the training loop
 
+  
   print(f'Results of Trail {trail}, Fold {fold} and Epoch {epoch}: {results}')
   return results, best_state
 
