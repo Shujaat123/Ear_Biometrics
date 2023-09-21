@@ -209,7 +209,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   
   fold_best_validation_accuracy = 0
-  fold_best_validation_accuracy_age = early_stop_thresh
+  fold_best_validation_accuracy_age = 0
   fold_best_validation_accuracy_epoch = 0
 
   #data
