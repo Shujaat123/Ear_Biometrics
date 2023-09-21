@@ -278,23 +278,23 @@ def train_epochs(X_train, y_train, X_test, y_test,
         }
         torch.save(best_checkpoint, "best_checkpoint.pth")
 
-    # creating the latest checkpoint and saving it in the file
-    latest_checkpoint = { 
-        'model': model.state_dict(), 
-        'optimizer': optimizer.state_dict(),
-        'training_accuracy': training_accuracy,
-        'training_loss': training_loss,
-        'validation_accuracy': validation_accuracy,
-        'validation_loss': validation_loss,
-        'current_state': current_state,
-        'best_state': best_state,
-        'max_state': max_state,
-        'results': results,
-    }
-    torch.save(latest_checkpoint, "latest_checkpoint.pth")
+    #torch.save(latest_checkpoint, "latest_checkpoint.pth")
     
     # saving checkpoint after every "checkpoint_save_step" (default = 5)
-    if checkpoint_save_step > 0 and (epoch%checkpoint_save_step==0 or epoch == epochs):
+    if (checkpoint_save_step > 0 and epoch%checkpoint_save_step==0) or epoch == epochs:
+        # creating the latest checkpoint and saving it in the file
+        latest_checkpoint = { 
+                                'model': model.state_dict(), 
+                                'optimizer': optimizer.state_dict(),
+                                'training_accuracy': training_accuracy,
+                                'training_loss': training_loss,
+                                'validation_accuracy': validation_accuracy,
+                                'validation_loss': validation_loss,
+                                'current_state': current_state,
+                                'best_state': best_state,
+                                'max_state': max_state,
+                                'results': results,
+                            }
         torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
       
     if validation_accuracy > fold_best_validation_accuracy:
@@ -314,16 +314,16 @@ def train_epochs(X_train, y_train, X_test, y_test,
                                       'trail': trail, 'fold': fold, 'epoch': epoch}
         # creating the latest checkpoint and saving it in the file
         latest_checkpoint = { 
-                            'model': model.state_dict(), 
-                            'optimizer': optimizer.state_dict(),
-                            'training_accuracy': training_accuracy,
-                            'training_loss': training_loss,
-                            'validation_accuracy': validation_accuracy,
-                            'validation_loss': validation_loss,
-                            'current_state': current_state,
-                            'best_state': best_state,
-                            'max_state': max_state,
-                            'results': results,
+                                'model': model.state_dict(), 
+                                'optimizer': optimizer.state_dict(),
+                                'training_accuracy': training_accuracy,
+                                'training_loss': training_loss,
+                                'validation_accuracy': validation_accuracy,
+                                'validation_loss': validation_loss,
+                                'current_state': current_state,
+                                'best_state': best_state,
+                                'max_state': max_state,
+                                'results': results,
                             }
           torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
           break  # terminate the training loop
