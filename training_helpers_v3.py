@@ -210,6 +210,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
   
   fold_best_validation_accuracy = 0
   fold_best_validation_accuracy_age = early_stop_thresh
+  fold_best_validation_accuracy_epoch = 0
 
   #data
   training_loader = DataLoader(TensorDataset(torch.tensor(X_train), torch.tensor(y_train)), batch_size=100, shuffle=True)
@@ -279,8 +280,12 @@ def train_epochs(X_train, y_train, X_test, y_test,
         torch.save(best_checkpoint, "best_checkpoint.pth")
 
     #torch.save(latest_checkpoint, "latest_checkpoint.pth")
-        
-    if fold_best_validation_accuracy_age >= early_stop_thresh:
+    
+    if validation_accuracy > fold_best_validation_accuracy:
+        fold_best_validation_accuracy = validation_accuracy
+        fold_best_validation_accuracy_age = fold_best_validation_accuracy_age+1
+      
+    if fold_best_validation_accuracy_age > early_stop_thresh:
         print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
         print(f"The best vaidation accuarcy was {fold_best_validation_accuracy} at state (trail, fold, epoch) = ({trail}, {fold}, {epoch-early_stop_thresh})")
         for epoch in range(epoch+1, epochs+1):
@@ -308,13 +313,6 @@ def train_epochs(X_train, y_train, X_test, y_test,
                                 'results': results,
                             }
         torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
-      
-    if validation_accuracy > fold_best_validation_accuracy:
-        fold_best_validation_accuracy = validation_accuracy
-        fold_best_validation_accuracy_age = fold_best_validation_accuracy_age+1
-
-        print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
-        print(f"The best vaidation accuarcy was {best_state['validation_accuracy']} at state (trail, fold, epoch) = ({best_state['trail']}, {best_state['fold']}, {best_state['epoch']})")
     
     #if current_index - best_validation_index >= early_stop_thresh:
     #    print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
