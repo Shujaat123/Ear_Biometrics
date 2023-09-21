@@ -234,7 +234,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                   'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
 
   
-  print(f'\n checkpoint_save_step = {checkpoint_save_step}')
+  #print(f'\n checkpoint_save_step = {checkpoint_save_step}')
   for epoch in range(epoch, epochs+1):
     current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
     print('EPOCH {}/{}:'.format(epoch,epochs))
@@ -320,7 +320,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
     #    break  # terminate the training loop
 
   
-  print(f'Results of Trail {trail}, Fold {fold} and Epoch {epoch}: {results}')
+  #print(f'Results of Trail {trail}, Fold {fold} and Epoch {epoch}: {results}')
   return results, best_state
 
 def reset_weights(m):
@@ -328,9 +328,10 @@ def reset_weights(m):
     Try resetting model weights to avoid
     weight leakage.
   '''
+  print('Reset trainable parameters of layers')
   for layer in m.children():
    if hasattr(layer, 'reset_parameters'):
-    print(f'Reset trainable parameters of layer = {layer}')
+    #print(f'Reset trainable parameters of layer = {layer}')
     layer.reset_parameters()
 
 def train_folds(ear_images, sub_labels, 
@@ -386,10 +387,10 @@ def train_folds(ear_images, sub_labels,
     # Print k-fold results
     print(f'K-FOLD CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
     print('--------------------------------')
-    print(f'checkpoint_save_step = {checkpoint_save_step}')
+    #print(f'checkpoint_save_step = {checkpoint_save_step}')
     sum = 0.0
     # K-fold Cross Validation model evaluation
-    print(f'Current State: {current_state}')
+    #print(f'Current State: {current_state}')
     for fold, (train_ids, test_ids) in enumerate(kfold.split(ear_images, sub_labels)):
     
         # Print
@@ -401,10 +402,10 @@ def train_folds(ear_images, sub_labels,
         X_test = ear_images[test_ids, :, :, : ]
         y_test = sub_labels[test_ids]
         
-        print('Training dataset:\n',X_train.shape)
-        print(y_train.shape)
-        print('Test dataset:\n',X_test.shape)
-        print(y_test.shape)
+        #print('Training dataset:\n',X_train.shape)
+        #print(y_train.shape)
+        #print('Test dataset:\n',X_test.shape)
+        #print(y_test.shape)
         
         # Reset model weights before each fold
         model.apply(reset_weights)
@@ -420,7 +421,7 @@ def train_folds(ear_images, sub_labels,
                                            resume_from=resume_from, results=results)
         #best_validation_accuracy = best_state['validation_accuracy']
         st_ind = (trail-1)*k_folds*epochs_per_fold + fold*epochs_per_fold
-        print(f"\n Start Index: {st_ind}\n Trail: {trail} \n Fold: {fold} \n K Folds: {k_folds} \n Epochs per Fold: {epochs_per_fold}")
+        #print(f"\n Start Index: {st_ind}\n Trail: {trail} \n Fold: {fold} \n K Folds: {k_folds} \n Epochs per Fold: {epochs_per_fold}")
         temp = []
         for ind in range(st_ind, st_ind + epochs_per_fold):
             temp.append(results[ind]['validation_accuracy'])
@@ -463,7 +464,7 @@ def train_trails(ear_images, sub_labels,
         optimizer.load_state_dict(resume_checkpoint['optimizer'])
     
     trail = current_state['trail'] if resume_from == None else current_state['trail'] + 1
-    print(f'---Atif---trail:{trail}')                
+    #print(f'---Atif---trail:{trail}')                
     #fold = 1
     #epoch = 1
     #best_validation_accuracy = 0
@@ -481,7 +482,7 @@ def train_trails(ear_images, sub_labels,
     # Print N trail results
     print(f'N-TRAILS CROSS VALIDATION RESULTS FOR {k_folds} FOLDS')
     print('--------------------------------')
-    print(f'checkpoint_save_step = {checkpoint_save_step}')
+    #print(f'checkpoint_save_step = {checkpoint_save_step}')
     sum = 0.0
     # N-trail Cross Validation model evaluation
     for trail in range(trail, n_trails+1):
