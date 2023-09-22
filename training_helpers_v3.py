@@ -285,7 +285,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
         fold_best_validation_accuracy = validation_accuracy
         fold_best_validation_accuracy_age = 0
         print(f"fold_best_validation_accuracy {fold_best_validation_accuracy}")
-    else
+    else:
         fold_best_validation_accuracy_age = fold_best_validation_accuracy_age+1
       
     if fold_best_validation_accuracy_age > early_stop_thresh:
