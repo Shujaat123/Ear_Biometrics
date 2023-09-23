@@ -288,7 +288,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
     else:
         fold_best_validation_accuracy_age = fold_best_validation_accuracy_age+1
       
-    if fold_best_validation_accuracy_age > early_stop_thresh:
+    if fold_best_validation_accuracy_age >= early_stop_thresh:
         print(f"early_stop_thresh {early_stop_thresh} {fold_best_validation_accuracy_age}")
         print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
         print(f"The best vaidation accuarcy was {fold_best_validation_accuracy} at state (trail, fold, epoch) = ({trail}, {fold}, {epoch-early_stop_thresh})")
@@ -319,6 +319,8 @@ def train_epochs(X_train, y_train, X_test, y_test,
                             }
         torch.save(latest_checkpoint, "checkpoint_trail_" + str(trail) + "_fold_" + str(fold) + "_epoch_" + str(epoch) + ".pth")
     
+    if fold_best_validation_accuracy_age >= early_stop_thresh:
+        break;
     #if current_index - best_validation_index >= early_stop_thresh:
     #    print(f"Early stopped training at state (trail, fold, epoch) = ({trail}, {fold}, {epoch})")
     #    print(f"The best vaidation accuarcy was {best_state['validation_accuracy']} at state (trail, fold, epoch) = ({best_state['trail']}, {best_state['fold']}, {best_state['epoch']})")
