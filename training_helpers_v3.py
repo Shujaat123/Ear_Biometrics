@@ -301,7 +301,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                                       'validation_accuracy': validation_accuracy,
                                       'trail': trail, 'fold': fold, 'epoch': epoch}
       
-    print(f"After early stop {epoch})
+    print(f"After early stop {epoch}")
     # saving checkpoint after every "checkpoint_save_step" (default = 5)
     if (checkpoint_save_step > 0 and epoch%checkpoint_save_step==0) or (epoch >= epochs):
         # creating the latest checkpoint and saving it in the file
