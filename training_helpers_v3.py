@@ -281,7 +281,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
     #torch.save(latest_checkpoint, "latest_checkpoint.pth")
     
-    if validation_accuracy >= fold_best_validation_accuracy:
+    if validation_accuracy > fold_best_validation_accuracy:
         fold_best_validation_accuracy = validation_accuracy
         fold_best_validation_accuracy_age = 0
         print(f"fold_best_validation_accuracy {fold_best_validation_accuracy}")
