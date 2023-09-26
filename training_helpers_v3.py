@@ -117,9 +117,9 @@ def train_one_epoch(training_loader, validation_loader,
         # print('train_output:',train_output)
 
         # Compute the loss and its gradients
-        loss_classifier = 2*(lambda1)*loss_fn(train_output, train_label)
-        loss_encoder = 2*(lambda2)*loss_fn2(train_input, decoded_input)
-        loss = loss_classifier + loss_encoder
+        classifier_loss = 2*(lambda1)*loss_fn(train_output, train_label)
+        encoder_loss = 2*(lambda2)*loss_fn2(train_input, decoded_input)
+        loss = classifier_loss + encoder_loss
 
         loss.backward()
 
@@ -128,6 +128,8 @@ def train_one_epoch(training_loader, validation_loader,
         # optimizer_classifier.step()
 
         # Gather data and report
+        train_classifier_loss += classifier_loss.item()
+        train_encoder_loss += encoder_loss.item()
         train_loss += loss.item()
         for batch_count in range(train_output.shape[0]):
           if(torch.argmax(train_output[batch_count,:]) == torch.argmax(train_label[batch_count,:])):
@@ -156,7 +158,9 @@ def train_one_epoch(training_loader, validation_loader,
         # print('valid_input:',valid_input.shape, 'valid_label:',valid_label.shape, 'valid_output:',valid_output.shape)
 
         # Gather data and report
-        valid_loss += loss_fn(valid_output, valid_label).item() + loss_fn2(valid_input, temp).item()
+        valid_classifier_loss += loss_fn(valid_output, valid_label).item()
+        valid_encoder_loss += loss_fn2(valid_input, temp).item()
+        valid_loss = valid_classifier_loss + valid_encoder_loss
         for batch_count in range(valid_output.shape[0]):
           if(torch.argmax(valid_output[batch_count,:]) == torch.argmax(valid_label[batch_count,:])):
             valid_correct += 1
