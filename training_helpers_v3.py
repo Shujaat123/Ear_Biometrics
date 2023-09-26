@@ -117,8 +117,9 @@ def train_one_epoch(training_loader, validation_loader,
         # print('train_output:',train_output)
 
         # Compute the loss and its gradients
-        loss = 2*(lambda1)*loss_fn(train_output, train_label)
-        loss = loss + 2*(lambda2)*loss_fn2(train_input, decoded_input)
+        loss_classifier = 2*(lambda1)*loss_fn(train_output, train_label)
+        loss_encoder = 2*(lambda2)*loss_fn2(train_input, decoded_input)
+        loss = loss_classifier + loss_encoder
 
         loss.backward()
 
