@@ -33,10 +33,14 @@ def train_one_epoch(training_loader, validation_loader,
     lambda2=model_parameters['lambda1']
     
     # training metrics
+    train_encoder_loss = 0
+    train_classifier_loss = 0
     train_loss = 0
     train_correct = 0
 
     # validation metrics
+    valid_encoder_loss = 0
+    valid_classifier_loss = 0
     valid_loss = 0
     valid_correct = 0
 
