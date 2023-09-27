@@ -286,7 +286,7 @@ def train_epochs(X_train, y_train, X_test, y_test,
                       'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
                       'validation_classifier_loss': validation_classifier_loss/num_validation_samples, 
                       'validation_accuracy': validation_accuracy, 
-                      'current_state': current_state}
+                      'trail': trail, 'fold': fold, 'epoch': epoch}
         # creating the best checkpoint and saving it in the file
         best_checkpoint = { 
             'model': model.state_dict(), 
