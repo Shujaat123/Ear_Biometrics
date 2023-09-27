@@ -272,8 +272,12 @@ def train_epochs(X_train, y_train, X_test, y_test,
                               'current_state': current_state}
     
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {training_loss/len(training_loader)}")
+    print(f"\n Average Training Encoder Loss: {training_encoder_loss/len(training_loader)}")
+    print(f"\n Average Training Classifier Loss: {training_classifier_loss/len(training_loader)}")
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {validation_loss/len(validation_loader)}")
-
+    print(f"\n Average Validation Encoder Loss: {validation_encoder_loss/len(training_loader)}")
+    print(f"\n Average Validation Classifier Loss: {validation_classifier_loss/len(training_loader)}")
+      
     if validation_accuracy > best_validation_accuracy: 
         best_validation_accuracy = validation_accuracy 
         best_validation_index = current_index
