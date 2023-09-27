@@ -117,9 +117,11 @@ def train_one_epoch(training_loader, validation_loader,
         # print('train_output:',train_output)
 
         # Compute the loss and its gradients
-        classifier_loss = 2*(lambda1)*loss_fn(train_output, train_label)
-        encoder_loss = 2*(lambda2)*loss_fn2(train_input, decoded_input)
-        loss = classifier_loss + encoder_loss
+        # loss = 2*(lambda1)*loss_fn(train_output, train_label)
+        # loss += 2*(lambda2)*loss_fn2(train_input, decoded_input)
+        classifier_loss = loss_fn(train_output, train_label)
+        encoder_loss = loss_fn2(train_input, decoded_input)
+        loss = (lambda1)*classifier_loss + (lambda2)*encoder_loss
 
         loss.backward()
 
@@ -160,7 +162,7 @@ def train_one_epoch(training_loader, validation_loader,
         # Gather data and report
         valid_classifier_loss += loss_fn(valid_output, valid_label).item()
         valid_encoder_loss += loss_fn2(valid_input, temp).item()
-        valid_loss = valid_classifier_loss + valid_encoder_loss
+        valid_loss = (lambda1)*valid_classifier_loss + (lambda2)*valid_encoder_loss
         for batch_count in range(valid_output.shape[0]):
           if(torch.argmax(valid_output[batch_count,:]) == torch.argmax(valid_label[batch_count,:])):
             valid_correct += 1
@@ -168,7 +170,7 @@ def train_one_epoch(training_loader, validation_loader,
     training_accuracy = 100*train_correct/num_training_samples
     validation_accuracy = 100*valid_correct/num_validation_samples
 
-    return train_loss, training_accuracy, valid_loss, validation_accuracy
+    return train_loss, train_encoder_loss, train_classifier_loss, training_accuracy, valid_loss, valid_encoder_loss, valid_classifier_loss, validation_accuracy
 
 def train_epochs(X_train, y_train, X_test, y_test, 
                  model_parameters={'model_type': "Encoder+Classifier", 
@@ -234,16 +236,20 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
   # For Epochs results
   if trail== 0 and fold==0:
-      results = [{'training_loss': 0, 'training_accuracy': 0, 
-                  'validation_loss': 0,'validation_accuracy': 0, 
-                  'trail': 0, 'fold': 0, 'epoch': 0}]*epochs
+      results = [{'training_loss': 0, 'training_encoder_loss': 0, 
+                  'training_classifier_loss': 0, 'training_accuracy': 0,
+                  'validation_loss': 0, 'validation_encoder_loss': 0, 
+                  'validation_classifier_loss': 0, 'validation_accuracy': 0, 
+                  'current_state': {'trail': 0, 'fold': 0, 'epoch': 0}}]*epochs
 
   
   #print(f'\n checkpoint_save_step = {checkpoint_save_step}')
   for epoch in range(epoch, epochs+1):
     current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
     print('EPOCH {}/{}:'.format(epoch,epochs))
-    training_loss, training_accuracy, validation_loss, validation_accuracy = \
+    # training_loss, training_accuracy, validation_loss, validation_accuracy 
+    training_loss, training_encoder_loss, training_classifier_loss, training_accuracy, \
+      validation_loss, validation_encoder_loss, validation_classifier_loss, validation_accuracy= \
       train_one_epoch(training_loader, validation_loader,
                       num_training_samples, num_validation_samples,
                       input_shape=input_shape, num_classes=num_classes,
@@ -251,11 +257,15 @@ def train_epochs(X_train, y_train, X_test, y_test,
 
     current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
       # where train batch size is 100, 
-    results[current_index] = {'training_loss': training_loss/(num_training_samples/100), 
+    results[current_index] = {'training_loss': training_loss/(num_training_samples/100),
+                              'training_encoder_loss': training_encoder_loss/(num_training_samples/100), 
+                              'training_classifier_loss': training_classifier_loss/(num_training_samples/100),
                               'training_accuracy': training_accuracy, 
-                              'validation_loss': validation_loss/num_validation_samples, 
+                              'validation_loss': validation_loss/num_validation_samples,
+                              'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
+                              'validation_classifier_loss': validation_classifier_loss/num_validation_samples,
                               'validation_accuracy': validation_accuracy,
-                              'trail': trail, 'fold': fold, 'epoch': epoch}
+                              'current_state': current_state}
     
     print(f"Training: \n Training Accuracy: {training_accuracy}%, Average Training Loss: {training_loss/len(training_loader)}")
     print(f"Validation: \n Validation Accuracy: {validation_accuracy}%, Average Validation Loss: {validation_loss/len(validation_loader)}")
@@ -264,19 +274,27 @@ def train_epochs(X_train, y_train, X_test, y_test,
         best_validation_accuracy = validation_accuracy 
         best_validation_index = current_index
         # Updating best state
-        best_state = {'training_loss': training_loss, 
+        best_state = {'training_loss': training_loss/(num_training_samples/100), 
+                      'training_encoder_loss': training_encoder_loss/(num_training_samples/100), 
+                      'training_classifier_loss': training_classifier_loss/(num_training_samples/100), 
                       'training_accuracy': training_accuracy, 
-                      'validation_loss': validation_loss, 
+                      'validation_loss': validation_loss/num_validation_samples, 
+                      'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
+                      'validation_classifier_loss': validation_classifier_loss/num_validation_samples, 
                       'validation_accuracy': validation_accuracy, 
-                      'trail': trail, 'fold': fold, 'epoch': epoch}
+                      'current_state': current_state}
         # creating the best checkpoint and saving it in the file
         best_checkpoint = { 
             'model': model.state_dict(), 
             'optimizer': optimizer.state_dict(),
-            'training_accuracy': training_accuracy,
-            'training_loss': training_loss,
-            'validation_accuracy': validation_accuracy,
-            'validation_loss': validation_loss,
+            'training_loss': training_loss/(num_training_samples/100), 
+            'training_encoder_loss': training_encoder_loss/(num_training_samples/100), 
+            'training_classifier_loss': training_classifier_loss/(num_training_samples/100), 
+            'training_accuracy': training_accuracy, 
+            'validation_loss': validation_loss/num_validation_samples, 
+            'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
+            'validation_classifier_loss': validation_classifier_loss/num_validation_samples, 
+            'validation_accuracy': validation_accuracy, 
             'current_state': current_state,
             'best_state': best_state,
             'max_state': max_state,
@@ -299,12 +317,17 @@ def train_epochs(X_train, y_train, X_test, y_test,
         print(f"The best vaidation accuarcy was {fold_best_validation_accuracy} at state (trail, fold, epoch) = ({trail}, {fold}, {epoch-early_stop_thresh})")
         for epoch in range(epoch+1, epochs+1):
             current_index = (trail-1)*kfolds*epochs + (fold-1)*epochs + (epoch-1)
+            current_state = {'trail': trail, 'fold': fold, 'epoch': epoch}
             # where train batch size is 100, 
-            results[current_index] = {'training_loss': training_loss/(num_training_samples/100), 
+            results[current_index] = {'training_loss': training_loss/(num_training_samples/100),
+                                      'training_encoder_loss': training_encoder_loss/(num_training_samples/100), 
+                                      'training_classifier_loss': training_classifier_loss/(num_training_samples/100),
                                       'training_accuracy': training_accuracy, 
-                                      'validation_loss': validation_loss/num_validation_samples, 
+                                      'validation_loss': validation_loss/num_validation_samples,
+                                      'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
+                                      'validation_classifier_loss': validation_classifier_loss/num_validation_samples,
                                       'validation_accuracy': validation_accuracy,
-                                      'trail': trail, 'fold': fold, 'epoch': epoch}
+                                      'current_state': current_state}
       
     print(f"After early stop {epoch}")
     # saving checkpoint after every "checkpoint_save_step" (default = 5)
@@ -313,10 +336,14 @@ def train_epochs(X_train, y_train, X_test, y_test,
         latest_checkpoint = { 
                                 'model': model.state_dict(), 
                                 'optimizer': optimizer.state_dict(),
-                                'training_accuracy': training_accuracy,
-                                'training_loss': training_loss,
-                                'validation_accuracy': validation_accuracy,
-                                'validation_loss': validation_loss,
+                                'training_loss': training_loss/(num_training_samples/100), 
+                                'training_encoder_loss': training_encoder_loss/(num_training_samples/100), 
+                                'training_classifier_loss': training_classifier_loss/(num_training_samples/100), 
+                                'training_accuracy': training_accuracy, 
+                                'validation_loss': validation_loss/num_validation_samples, 
+                                'validation_encoder_loss': validation_encoder_loss/num_validation_samples, 
+                                'validation_classifier_loss': validation_classifier_loss/num_validation_samples, 
+                                'validation_accuracy': validation_accuracy, 
                                 'current_state': current_state,
                                 'best_state': best_state,
                                 'max_state': max_state,
