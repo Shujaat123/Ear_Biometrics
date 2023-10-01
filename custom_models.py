@@ -8,7 +8,7 @@ from torchvision import models #just for debugging
 
 class Feature_Extraction_Module(torch.nn.Module):
   #  Determine what layers and their order in CNN object
-  def __init__(self, num_classes=221, num_filters=8, input_shape=(180,50,3)):
+  def __init__(self, num_classes=221, num_filters=8, input_shape=(180,50,3), conv_type="conventional"):
     super(Feature_Extraction_Module,self).__init__()
     #self.encoder_input = input_shape[-1]
     kernel_size = 3
@@ -57,10 +57,15 @@ class Feature_Extraction_Module(torch.nn.Module):
 
     # Encoder Layer5
     self.encoder_layer5_name = 'encoder_layer5'
-    self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
-                                               16*num_filters,
-                                               kernel_size,
-                                               padding='same')
+    if conv_type=="conventional":
+      self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
+                                                 16*num_filters,
+                                                 kernel_size,
+                                                 padding='same')
+    elif conv_type=="deformable":
+      self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
+                                                 16*num_filters,
+                                                 kernel_size)    
 
     self.encoder_layer5_activation = torch.nn.ReLU()
     self.encoder_layer5_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
