@@ -3,7 +3,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import torch.nn
 import torch.nn.functional
 import torch.optim
-from torchvision import models #just for debugging
+from torchvision import models, ops #just for debugging
 
 
 class Feature_Extraction_Module(torch.nn.Module):
@@ -290,7 +290,7 @@ class AutoEncoder_model(torch.nn.Module):
     return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
 
 
-class DeformableConv2d(nn.Module):
+class DeformableConv2d(torch.nn.Module):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -307,7 +307,7 @@ class DeformableConv2d(nn.Module):
         self.stride = stride if type(stride) == tuple else (stride, stride)
         self.padding = padding
 
-        self.offset_conv = nn.Conv2d(in_channels,
+        self.offset_conv = torch.nn.Conv2d(in_channels,
                                      2 * kernel_size[0] * kernel_size[1],
                                      kernel_size=kernel_size,
                                      stride=stride,
@@ -317,7 +317,7 @@ class DeformableConv2d(nn.Module):
         nn.init.constant_(self.offset_conv.weight, 0.)
         nn.init.constant_(self.offset_conv.bias, 0.)
 
-        self.modulator_conv = nn.Conv2d(in_channels,
+        self.modulator_conv = torch.nn.Conv2d(in_channels,
                                      1 * kernel_size[0] * kernel_size[1],
                                      kernel_size=kernel_size,
                                      stride=stride,
