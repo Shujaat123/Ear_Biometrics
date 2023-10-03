@@ -248,7 +248,8 @@ class LSE_model(torch.nn.Module):
   def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3), conv_type="conventional"):
     super(LSE_model,self).__init__()
 
-    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape, conv_type="conventional")
+    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, 
+                                                               input_shape=input_shape, conv_type=conv_type)
     self.classification_module = Classifier_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
     self.feature_decoder_module = Feature_Decoder_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
     self.input_shape = input_shape
