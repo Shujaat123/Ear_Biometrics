@@ -318,8 +318,8 @@ class DeformableConv2d(torch.nn.Module):
                                      padding=self.padding,
                                      bias=True)
 
-        nn.init.constant_(self.offset_conv.weight, 0.)
-        nn.init.constant_(self.offset_conv.bias, 0.)
+        torch.nn.init.constant_(self.offset_conv.weight, 0.)
+        torch.nn.init.constant_(self.offset_conv.bias, 0.)
 
         self.modulator_conv = torch.nn.Conv2d(in_channels,
                                      1 * kernel_size[0] * kernel_size[1],
@@ -328,8 +328,8 @@ class DeformableConv2d(torch.nn.Module):
                                      padding=self.padding,
                                      bias=True)
 
-        nn.init.constant_(self.modulator_conv.weight, 0.)
-        nn.init.constant_(self.modulator_conv.bias, 0.)
+        torch.nn.init.constant_(self.modulator_conv.weight, 0.)
+        torch.nn.init.constant_(self.modulator_conv.bias, 0.)
 
         self.regular_conv = nn.Conv2d(in_channels=in_channels,
                                       out_channels=out_channels,
