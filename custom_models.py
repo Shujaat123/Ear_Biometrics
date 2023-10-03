@@ -63,6 +63,7 @@ class Feature_Extraction_Module(torch.nn.Module):
                                                  kernel_size,
                                                  padding='same')
     elif conv_type=="deformable":
+      print("I am in Deformable Convolutional Neural Network")
       self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
                                                  16*num_filters,
                                                  kernel_size)    
