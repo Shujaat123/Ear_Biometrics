@@ -331,7 +331,7 @@ class DeformableConv2d(torch.nn.Module):
         torch.nn.init.constant_(self.modulator_conv.weight, 0.)
         torch.nn.init.constant_(self.modulator_conv.bias, 0.)
 
-        self.regular_conv = nn.Conv2d(in_channels=in_channels,
+        self.regular_conv = torch.nn.Conv2d(in_channels=in_channels,
                                       out_channels=out_channels,
                                       kernel_size=kernel_size,
                                       stride=stride,
