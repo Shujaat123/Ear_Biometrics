@@ -56,8 +56,10 @@ class Feature_Extraction_Module(torch.nn.Module):
     self.encoder_layer4_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
 
     # Encoder Layer5
+    print(f'conv_type: {conv_type}')
     self.encoder_layer5_name = 'encoder_layer5'
     if conv_type=="conventional":
+      print("I am in Convolutional Neural Network")
       self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
                                                  16*num_filters,
                                                  kernel_size,
