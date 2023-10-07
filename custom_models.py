@@ -341,6 +341,7 @@ class DeformableConv2d(torch.nn.Module):
     def forward(self, x):
         #h, w = x.shape[2:]
         #max_offset = max(h, w)/4.
+        print("I am in Forward of Deformable Convolutional Neural Network")
 
         offset = self.offset_conv(x)#.clamp(-max_offset, max_offset)
         modulator = 2. * torch.sigmoid(self.modulator_conv(x))
