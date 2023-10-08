@@ -13,6 +13,7 @@ class Feature_Extraction_Module(torch.nn.Module):
     #self.encoder_input = input_shape[-1]
     kernel_size = 3
     # Encoder Layer1
+    print(f'conv_type: {conv_type}')
     self.encoder_layer1_name = 'encoder_layer1'
     if conv_type=="conventional":
       print("I am in Convolutional Neural Network")
@@ -23,12 +24,12 @@ class Feature_Extraction_Module(torch.nn.Module):
     
     elif conv_type=="deformable":
       print("I am in Deformable Convolutional Neural Network")
-      self.encoder_layer1_conv = DeformableConv2d(8*num_filters,
-                                                 16*num_filters,
+      self.encoder_layer1_conv = DeformableConv2d(input_shape[2],
+                                                 num_filters,
                                                  kernel_size)
       
-      self.encoder_layer1_activation = torch.nn.ReLU()
-      self.encoder_layer1_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
+    self.encoder_layer1_activation = torch.nn.ReLU()
+    self.encoder_layer1_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
       
     # Encoder Layer2
     self.encoder_layer2_name = 'encoder_layer2'
@@ -64,24 +65,23 @@ class Feature_Extraction_Module(torch.nn.Module):
     self.encoder_layer4_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
 
     # Encoder Layer5
-    print(f'conv_type: {conv_type}')
     self.encoder_layer5_name = 'encoder_layer5'
-    if conv_type=="conventional":
-      print("I am in Convolutional Neural Network")
-      self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
-                                                 16*num_filters,
-                                                 kernel_size,
-                                                 padding='same')
-    elif conv_type=="deformable":
-      print("I am in Deformable Convolutional Neural Network")
-      self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
-                                                 16*num_filters,
-                                                 kernel_size)    
+    #if conv_type=="conventional":
+    #  print("I am in Convolutional Neural Network")
+    self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
+                                               16*num_filters,
+                                               kernel_size,
+                                               padding='same')
+    # elif conv_type=="deformable":
+    #  print("I am in Deformable Convolutional Neural Network")
+    #  self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
+    #                                             16*num_filters,
+    #                                             kernel_size)    
 
     self.encoder_layer5_activation = torch.nn.ReLU()
     self.encoder_layer5_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
 
-   # Encoder Layer6
+    # Encoder Layer6
     self.encoder_layer6_name = 'encoder_layer2'
     self.encoder_layer6_conv = torch.nn.Conv2d(16*num_filters,
                                                32*num_filters,
@@ -94,6 +94,7 @@ class Feature_Extraction_Module(torch.nn.Module):
 
   def forward(self,x):
     # Encoder Layer1
+    print(f'In forward conv_type: {conv_type}')
     out = self.encoder_layer1_conv(x)
     out = self.encoder_layer1_activation(out)
     out = self.encoder_layer1_pooling(out)
