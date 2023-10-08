@@ -12,32 +12,35 @@ class Feature_Extraction_Module(torch.nn.Module):
     super(Feature_Extraction_Module,self).__init__()
     #self.encoder_input = input_shape[-1]
     kernel_size = 3
+    # Encoder Layer1
+    self.encoder_layer1_name = 'encoder_layer1'
     if conv_type=="conventional":
       print("I am in Convolutional Neural Network")
-      # Encoder Layer1
-      self.encoder_layer1_name = 'encoder_layer1'
       self.encoder_layer1_conv = torch.nn.Conv2d(input_shape[2],
                                                  num_filters,
                                                  kernel_size,
                                                  padding='same')
-      self.encoder_layer1_activation = torch.nn.ReLU()
-      self.encoder_layer1_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
+    
     elif conv_type=="deformable":
       print("I am in Deformable Convolutional Neural Network")
-      self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
+      self.encoder_layer1_conv = DeformableConv2d(8*num_filters,
                                                  16*num_filters,
                                                  kernel_size)
-      # Encoder Layer2
-      self.encoder_layer2_name = 'encoder_layer2'
-      self.encoder_layer2_conv = torch.nn.Conv2d(num_filters,
-                                                 2*num_filters,
-                                                 kernel_size,
-                                                 padding='same')
-      self.encoder_layer2_activation = torch.nn.ReLU()
-      self.encoder_layer2_batch_norm = torch.nn.BatchNorm2d(2*num_filters,
-                                                            eps = 1e-3,
-                                                            momentum = 0.99)
-      self.encoder_layer2_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
+      
+      self.encoder_layer1_activation = torch.nn.ReLU()
+      self.encoder_layer1_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
+      
+    # Encoder Layer2
+    self.encoder_layer2_name = 'encoder_layer2'
+    self.encoder_layer2_conv = torch.nn.Conv2d(num_filters,
+                                               2*num_filters,
+                                               kernel_size,
+                                               padding='same')
+    self.encoder_layer2_activation = torch.nn.ReLU()
+    self.encoder_layer2_batch_norm = torch.nn.BatchNorm2d(2*num_filters,
+                                                          eps = 1e-3,
+                                                          momentum = 0.99)
+    self.encoder_layer2_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
 
     # Encoder Layer3
     self.encoder_layer3_name = 'encoder_layer3'
