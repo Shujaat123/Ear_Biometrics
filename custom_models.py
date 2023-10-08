@@ -94,7 +94,6 @@ class Feature_Extraction_Module(torch.nn.Module):
 
   def forward(self,x):
     # Encoder Layer1
-    print(f'In forward conv_type: {conv_type}')
     out = self.encoder_layer1_conv(x)
     out = self.encoder_layer1_activation(out)
     out = self.encoder_layer1_pooling(out)
@@ -313,7 +312,8 @@ class DeformableConv2d(torch.nn.Module):
                  bias=False):
 
         super(DeformableConv2d, self).__init__()
-
+        
+        print('Initializing Deformable Convolution')
         assert type(kernel_size) == tuple or type(kernel_size) == int
 
         kernel_size = kernel_size if type(kernel_size) == tuple else (kernel_size, kernel_size)
