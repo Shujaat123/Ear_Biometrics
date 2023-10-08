@@ -454,7 +454,11 @@ def train_folds(ear_images, sub_labels,
         #print(y_test.shape)
         
         # Reset model weights before each fold
-        model.apply(reset_weights)
+        model_checkpoint = torch.load("model_checkpoint.pth")
+        model.load_state_dict(model_checkpoint['model'])
+        optimizer.load_state_dict(model_checkpoint['optimizer'])
+        # model.apply(reset_weights)
+        
         current_state = {'trail': trail, 'fold': fold+1, 'epoch': 1}
         results, best_state = train_epochs(X_train, y_train, X_test, y_test, 
                                            model_parameters=model_parameters, 
