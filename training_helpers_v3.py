@@ -442,7 +442,7 @@ def train_folds(ear_images, sub_labels,
         # Print
         print(f'FOLD {fold+1}')
         print('--------------------------------')
-        if(fold != 1):
+        if(fold != 2):
             print(f"Skiping Fold {fold+1}")
             continue
         X_train = ear_images[train_ids, :, :, :]
