@@ -3,25 +3,34 @@ from torch.utils.data import TensorDataset, DataLoader
 import torch.nn
 import torch.nn.functional
 import torch.optim
-from torchvision import models #just for debugging
+from torchvision import models, ops #just for debugging
 
 
 class Feature_Extraction_Module(torch.nn.Module):
   #  Determine what layers and their order in CNN object
-  def __init__(self, num_classes=221, num_filters=8, input_shape=(180,50,3)):
+  def __init__(self, num_classes=221, num_filters=8, input_shape=(180,50,3), conv_type="conventional"):
     super(Feature_Extraction_Module,self).__init__()
     #self.encoder_input = input_shape[-1]
     kernel_size = 3
     # Encoder Layer1
+    print(f'conv_type: {conv_type}')
     self.encoder_layer1_name = 'encoder_layer1'
-    self.encoder_layer1_conv = torch.nn.Conv2d(input_shape[2],
-                                               num_filters,
-                                               kernel_size,
-                                               padding='same')
-
+    if conv_type=="conventional":
+      print("I am in Convolutional Neural Network")
+      self.encoder_layer1_conv = torch.nn.Conv2d(input_shape[2],
+                                                 num_filters,
+                                                 kernel_size,
+                                                 padding='same')
+    
+    elif conv_type=="deformable":
+      print("I am in Deformable Convolutional Neural Network")
+      self.encoder_layer1_conv = DeformableConv2d(input_shape[2],
+                                                 num_filters,
+                                                 kernel_size)
+      
     self.encoder_layer1_activation = torch.nn.ReLU()
     self.encoder_layer1_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
-
+      
     # Encoder Layer2
     self.encoder_layer2_name = 'encoder_layer2'
     self.encoder_layer2_conv = torch.nn.Conv2d(num_filters,
@@ -57,15 +66,22 @@ class Feature_Extraction_Module(torch.nn.Module):
 
     # Encoder Layer5
     self.encoder_layer5_name = 'encoder_layer5'
+    #if conv_type=="conventional":
+    #  print("I am in Convolutional Neural Network")
     self.encoder_layer5_conv = torch.nn.Conv2d(8*num_filters,
                                                16*num_filters,
                                                kernel_size,
                                                padding='same')
+    # elif conv_type=="deformable":
+    #  print("I am in Deformable Convolutional Neural Network")
+    #  self.encoder_layer5_conv = DeformableConv2d(8*num_filters,
+    #                                             16*num_filters,
+    #                                             kernel_size)    
 
     self.encoder_layer5_activation = torch.nn.ReLU()
     self.encoder_layer5_pooling = torch.nn.MaxPool2d(kernel_size=(2, 2))
 
-   # Encoder Layer6
+    # Encoder Layer6
     self.encoder_layer6_name = 'encoder_layer2'
     self.encoder_layer6_conv = torch.nn.Conv2d(16*num_filters,
                                                32*num_filters,
@@ -109,8 +125,7 @@ class Feature_Extraction_Module(torch.nn.Module):
     out = self.encoder_layer6_activation(out)
     out = self.encoder_layer6_batch_norm(out)
 
-    return out
-  
+    return out  
 
 class Feature_Decoder_Module(torch.nn.Module):
   #  Determine what layers and their order in CNN object
@@ -237,10 +252,11 @@ class Classifier_Module(torch.nn.Module):
   
 class LSE_model(torch.nn.Module):
   #  Determine what layers and their order in CNN object
-  def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3)):
+  def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3), conv_type="conventional"):
     super(LSE_model,self).__init__()
 
-    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, 
+                                                               input_shape=input_shape, conv_type=conv_type)
     self.classification_module = Classifier_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
     self.feature_decoder_module = Feature_Decoder_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
     self.input_shape = input_shape
@@ -250,8 +266,49 @@ class LSE_model(torch.nn.Module):
     encoded_output = self.feature_extraction_module(x)
     out = self.classification_module(encoded_output)
     decoded_output = self.feature_decoder_module(encoded_output)
-    return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
+    return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]], encoded_output
+  
+class LSE_contrastive_model(torch.nn.Module):
+  #  Determine what layers and their order in CNN object
+  def __init__(self, num_classes=100, num_filters=8, input_shape=(180,50,3), conv_type="conventional"):
+    super(LSE_model,self).__init__()
 
+    self.feature_extraction_module = Feature_Extraction_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape, conv_type=conv_type)
+    self.feature_projection_module = Feature_Projection_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape, conv_type=conv_type)    
+    self.classification_module = Classifier_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.feature_decoder_module = Feature_Decoder_Module(num_classes=num_classes, num_filters=num_filters, input_shape=input_shape)
+    self.input_shape = input_shape
+
+    # For projection network P
+    self.contrastive_hidden_layer = nn.Linear(64, contrastive_dimension)
+    self.contrastive_output_layer = nn.Linear(contrastive_dimension, contrastive_dimension)
+    
+    # Dense layer
+    self.fc1_flatten = torch.nn.Flatten()
+    self.fc1_linear = torch.nn.Linear(32*num_filters*(input_shape[0]//(2**5))*(input_shape[1]//(2**5)), num_classes)
+    self.fc1_activation = torch.nn.Softmax()
+
+  def forward_constrative(self, x):
+    # Implement from the encoder E to the projection network P
+    encoded_output = self.feature_extraction_module(x)
+
+    x = self.contrastive_hidden_layer(encoded_output)
+    x = F.relu(x)
+    x = self.contrastive_output_layer(x)
+
+    # Normalize to unit hypersphere
+    projection = F.normalize(x, dim=1)
+
+    return projection
+  
+  def forward(self,x):
+    # Encoder Layer1
+    encoded_output = self.feature_extraction_module(x)
+    print(f'encoded_output: {encoded_output.shape}')
+    out = self.classification_module(encoded_output)
+    decoded_output = self.feature_decoder_module(encoded_output)
+    print(f'decoded_output: {decoded_output.shape}')
+    return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
 
 class Simple_Classification_model(torch.nn.Module):
   #  Determine what layers and their order in CNN object
@@ -283,6 +340,70 @@ class AutoEncoder_model(torch.nn.Module):
     encoded_output = self.feature_extraction_module(x)
     decoded_output = self.feature_decoder_module(encoded_output)
     return out, decoded_output[:,:,0:self.input_shape[0],0:self.input_shape[1]]
+
+
+class DeformableConv2d(torch.nn.Module):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size=3,
+                 stride=1,
+                 padding=1,
+                 bias=False):
+
+        super(DeformableConv2d, self).__init__()
+        
+        print('Initializing Deformable Convolution')
+        assert type(kernel_size) == tuple or type(kernel_size) == int
+
+        kernel_size = kernel_size if type(kernel_size) == tuple else (kernel_size, kernel_size)
+        self.stride = stride if type(stride) == tuple else (stride, stride)
+        self.padding = padding
+
+        self.offset_conv = torch.nn.Conv2d(in_channels,
+                                     2 * kernel_size[0] * kernel_size[1],
+                                     kernel_size=kernel_size,
+                                     stride=stride,
+                                     padding=self.padding,
+                                     bias=True)
+
+        torch.nn.init.constant_(self.offset_conv.weight, 0.)
+        torch.nn.init.constant_(self.offset_conv.bias, 0.)
+
+        self.modulator_conv = torch.nn.Conv2d(in_channels,
+                                     1 * kernel_size[0] * kernel_size[1],
+                                     kernel_size=kernel_size,
+                                     stride=stride,
+                                     padding=self.padding,
+                                     bias=True)
+
+        torch.nn.init.constant_(self.modulator_conv.weight, 0.)
+        torch.nn.init.constant_(self.modulator_conv.bias, 0.)
+
+        self.regular_conv = torch.nn.Conv2d(in_channels=in_channels,
+                                      out_channels=out_channels,
+                                      kernel_size=kernel_size,
+                                      stride=stride,
+                                      padding=self.padding,
+                                      bias=bias)
+
+    def forward(self, x):
+        #h, w = x.shape[2:]
+        #max_offset = max(h, w)/4.
+        #print("I am in Forward of Deformable Convolutional Neural Network")
+
+        offset = self.offset_conv(x)#.clamp(-max_offset, max_offset)
+        modulator = 2. * torch.sigmoid(self.modulator_conv(x))
+
+        x = ops.deform_conv2d(input=x,
+                                          offset=offset,
+                                          weight=self.regular_conv.weight,
+                                          bias=self.regular_conv.bias,
+                                          padding=self.padding,
+                                          mask=modulator,
+                                          stride=self.stride,
+                                          )
+        return x
 
   
 

@@ -11,11 +11,11 @@ import wget
 from zipfile import ZipFile
 
 ##################
-def load_dataset(dataset='AMI', target_size = (50, 180)):
+def load_dataset(dataset='AMI_dataset', target_size = (50, 180)):
   ### This function load ear-biometric datasets and reshape into specified size
   ##########
 
-  if (dataset=='AMI'):
+  if (dataset=='AMI_dataset'):
     # target_size = (246, 351) 
     data_path = 'https://github.com/Shujaat123/Ear_Biometrics/blob/main/datasets/AMI_dataset.zip?raw=true'
     filename = 'AMI_dataset.zip'
@@ -114,8 +114,9 @@ def load_dataset(dataset='AMI', target_size = (50, 180)):
     ear_img = (plt.imread(img_path))/255
 
     ear_img = Image.open(img_path)
-    ear_img = ear_img.resize(target_size, Image.ANTIALIAS)
+    ear_img = ear_img.resize(target_size, Image.LANCZOS)
     ear_img = np.asarray(ear_img).astype(np.float32)/255
+    #ear_img = np.asarray(ear_img)
     
     if(len(ear_img.shape)<3):
       ear_img = np.expand_dims(ear_img,axis=0)
