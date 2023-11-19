@@ -116,6 +116,7 @@ def load_dataset(dataset='AMI_dataset', target_size = (50, 180)):
     ear_img = Image.open(img_path)
     ear_img = ear_img.resize(target_size, Image.LANCZOS)
     ear_img = np.asarray(ear_img).astype(np.float32)/255
+    #ear_img = np.asarray(ear_img)
     
     if(len(ear_img.shape)<3):
       ear_img = np.expand_dims(ear_img,axis=0)
